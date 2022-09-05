@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "../vector.h"
+#include <fstream>
 /////////////////////////////////////////////////////////////////
 //Dos Cuerpos Celestes - metodo de integracion PEFRL           //
 //                                                             //
@@ -96,14 +97,17 @@ int main(){
   double t,tmax=21*T, dt=0.01;
   double tdibujo, tcuadro=T/100;
   int i;
+  std::ofstream outfile;
+
+  outfile.open("S-J_original_axis.dat");
 
   Planeta[0].Inicie(x1,0,0,0,V1,0,m1,97.3);
   Planeta[1].Inicie(x2,0,0,0,V2,0,m2,10.0);
   
   //InicieAnimacion();
   for(t=0,tdibujo=0; t<tmax; t+=dt, tdibujo+=dt){
-    std::cout<<Planeta[0].Getx()<<" "<<Planeta[0].Gety()<<" ";
-    std::cout<<Planeta[1].Getx()<<" "<<Planeta[1].Gety()<<std::endl;
+    outfile<<Planeta[0].Getx()<<" "<<Planeta[0].Gety()<<" "
+	   <<Planeta[1].Getx()<<" "<<Planeta[1].Gety()<<std::endl;
     // Haga el movimiento y los calculos por PEFRL
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1 
     Newton.CalculeFuerza(Planeta);
