@@ -2,23 +2,17 @@
 #include <cmath>
 #include "../../vector.h"
 /////////////////////////////////////////////////////////////////
-// Dos Cuerpos Celestes - metodo de integracion PEFRL          //
+// Dos planetas                                                //
 //                                                             //
 // En este programa se simula y anima el movimiento ente dos   //
 // planetas con un observador ajeno al sistema, a este último  //
 // se le llama colisionador o interaccionador.                 //
-// Los objetos celestes son el Sol y Júpiter a quienes vamos a //
-// asignar las masas y radios como razones entre ellos:        //
-// m_sol = 1047 m_jupiter    ,  r_sol = 9.73 r_jupiter         //
-// m_jupiter = 1             ,  r_jupiter = 1                  //
-// El código esta "configurado" para realizar la animación del //
-// movimiento de ambos cuerpos. Si se desea graficar sin       //
-// animación comentar lineas 129 a 135 y descomentar lines     //
-// 137 y 138. Para el gif activar las lineas 96 y 97.          //
 /////////////////////////////////////////////////////////////////
-const double G=1.0; // Constante gravitacional
-const int N=2;      // Nos permitirá crear el arreglo Sol-Júpiter
+const double G=1.0;
+// Tenemos dos planetas
+const int N=2; // Nos permitirá cerar un arreglo de dos planetas
 
+// constantes globales
 // Coeficientes de PEFRL
 const double Zeta   = 0.1786178958448091e00;
 const double Lambda = -0.2123418310626054e00;
@@ -40,12 +34,10 @@ public:
   void SumeFuerza(vector3D F0);
   void Mueva_r(double dt, double coeficiente);
   void Mueva_v(double dt, double coeficiente);
-  void Dibujese(void);             
   double Getx(void){return r.x();}; //Inline
   double Gety(void){return r.y();}; //Inline
   double Getz(void){return r.z();}; //Inline
-  friend class Colisionador; //Cualquier especimen de la clase colisionador
-                             // le puede meter la mano a la clase cuerpo
+  friend class Colisionador; //Cualquier especimen de la clase colisionador le puede meter la mano a la clase cuerpo
 };
 void Cuerpo::Inicie(double x0,double y0,double z0, double Vx0, double Vy0, double Vz0,double m0,double R0){
   r.load(x0,y0,z0);
@@ -65,9 +57,6 @@ void Cuerpo::Mueva_r(double dt,double coeficiente){
 void Cuerpo::Mueva_v(double dt,double coeficiente){
   vector3D r_new;
   V+=F*dt*coeficiente/m;
-}
-void Cuerpo::Dibujese(void){
-  std::cout<<" , "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)"; 
 }
 //------------------ Class Colisionador ------------------------//
 class Colisionador {
@@ -92,32 +81,13 @@ void Colisionador::CalculeFuerzaEntre(Cuerpo & Planeta1, Cuerpo &Planeta2){
   Planeta1.SumeFuerza(F1); Planeta2.SumeFuerza(F1*(-1));
 }
 //------------------ Funciones globales ------------------------//
-void InicieAnimacion(void){
-  //std::cout<<"set terminal gif animate"<<std::endl;  // quitar si quiero imprimir en el termminal
-  //std::cout<<"set output 'DosPlanetas.gif'"<<std::endl; // quitar si quiero imprimir en el termminal
-  std::cout<<"set grid"<<std::endl;
-  std::cout<<"show grid"<<std::endl;
-  std::cout<<"unset key"<<std::endl;     // quitar si quiero imprimir un gif
-  std::cout<<"set xrange[-1100:1100]"<<std::endl;
-  std::cout<<"set yrange[-1100:1100]"<<std::endl;
-  std::cout<<"set size ratio -1"<<std::endl;
-  std::cout<<"set parametric"<<std::endl; // la variable parametrica es t 
-  std::cout<<"set trange[0:7]"<<std::endl;
-  std::cout<<"set isosamples 12"<<std::endl;
-}
-void InicieCuadro(void){
-  std::cout<<"plot 0,0 ";
-}
-void TermineCuadro(void){
-  std::cout<<std::endl;
-}
 int main(){
   Cuerpo Planeta[N];
   Colisionador Newton;
   double m1=1047, m2=1, r=1000;
   double M=m1+m2, x1=-m2*r/M, x2=m1*r/M;
   double omega = sqrt(G*M/pow(r,3.0)), T=2*M_PI/omega, V1=omega*x1, V2=omega*x2;
-  double t,tmax=20*T, dt=0.01;
+  double t,tmax=21*T, dt=0.01;
   double tdibujo, tcuadro=T/100;
   int i;
 
@@ -125,17 +95,9 @@ int main(){
   Planeta[1].Inicie(x2,0,0,0,V2,0,m2,10.0);
   
   //InicieAnimacion();
-  for(t=0,tdibujo=0; t<=tmax; t+=dt, tdibujo+=dt){
-    //Dibujar
-    if(tdibujo>tcuadro){
-      InicieCuadro();
-      for(i=0;i<N;i++) 	Planeta[i].Dibujese();
-      TermineCuadro();
-      tdibujo=0; 
-    }
-  
-    //std::cout<<Planeta[0].Getx()<<" "<<Planeta[0].Gety()<<" ";
-    //std::cout<<Planeta[1].Getx()<<" "<<Planeta[1].Gety()<<std::endl;
+  for(t=0,tdibujo=0; t<tmax; t+=dt, tdibujo+=dt){
+    std::cout<<Planeta[0].Getx()<<" "<<Planeta[0].Gety()<<" ";
+    std::cout<<Planeta[1].Getx()<<" "<<Planeta[1].Gety()<<std::endl;
     // Haga el movimiento y los calculos por PEFRL
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1 
     Newton.CalculeFuerza(Planeta);
