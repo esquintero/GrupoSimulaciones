@@ -2,11 +2,17 @@
 #include <cmath>
 #include "../vector.h"
 /////////////////////////////////////////////////////////////////
-// Dos planetas                                                //
+//Dos Cuerpos Celestes - metodo de integracion PEFRL           //
 //                                                             //
 // En este programa se simula y anima el movimiento ente dos   //
 // planetas con un observador ajeno al sistema, a este último  //
 // se le llama colisionador o interaccionador.                 //
+// Los objetos celestes son el Sol y Júpiter a quienes vamos a //
+// asignar las masas y radios como razones entre ellos:        //
+//                                                             //
+// m_sol = 1047 m_jupiter    ,  r_sol = 9.73 r_jupiter         //
+// m_jupiter = 1             ,  r_jupiter = 1                  //
+//                                                             //
 /////////////////////////////////////////////////////////////////
 const double G=1.0;
 // Tenemos dos planetas
