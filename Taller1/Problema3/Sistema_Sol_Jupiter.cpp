@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include "../../vector.h"
+#include "../vector.h"
 /////////////////////////////////////////////////////////////////
 // Dos planetas                                                //
 //                                                             //
