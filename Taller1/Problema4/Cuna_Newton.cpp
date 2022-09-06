@@ -66,7 +66,7 @@ void Cuerpo::Dibujese(void)
   // Dibuja bola
   cout << " , " << Getx() << "+" << R << "*cos(t)," << Gety() << "+" << R << "*sin(t)";
   // Dibuja hilo
-  cout << " , " << x0 << "+" << l/7 << "+t*sin("<<theta<<"),-" << l/7 << "*t*cos("<<theta<<")";
+  cout << " , " << x0 << "+" << l/7 << "*t*sin("<<theta<<"),-" << l/7 << "*t*cos("<<theta<<")";
 }
 
 class Colisionador{
