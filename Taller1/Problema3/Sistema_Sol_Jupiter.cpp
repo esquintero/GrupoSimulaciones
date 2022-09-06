@@ -111,7 +111,8 @@ int main(){
 
   Planeta[0].Inicie(x1, 0,0,  0, V1,0,m1,97.3); // Sol
   Planeta[1].Inicie(x2, 0,0,  0, V2,0,m2,10.0); // Júpiter
-  Planeta[2].Inicie(x3,y3,0,Vx3,Vy3,0,m3, 1.0); // Planeta Troyano
+  //  Planeta[2].Inicie(x3,y3,0,Vx3,Vy3,0,m3, 1.0); // Planeta Troyano
+  Planeta[2].Inicie(x3*0.009,y3,0,Vx3,Vy3,0,m3, 1.0); // Planeta Troyano Perturbado
   for(t=0,tdibujo=0; t<tmax; t+=dt, tdibujo+=dt){
     outfile<<Planeta[0].Getx()<<" "<<Planeta[0].Gety()<<" "
 	     <<Planeta[1].Getx()<<" "<<Planeta[1].Gety()<<" "
