@@ -8,7 +8,6 @@
 // los cálculos del movimiento y fuerzas y el observador       //
 //                                                             //
 /////////////////////////////////////////////////////////////////
-
 // Clases
 class Cuerpo;
 class Colisionador;
@@ -51,18 +50,18 @@ void Cuerpo::Mueva_v(double dt,double coeficiente){
 class Colisionador {
 private:
 public:
-  void CalculeFuerza(Cuerpo * Planeta);
-  void CalculeFuerzaEntre(Cuerpo &  Planeta1, Cuerpo & Planeta2);
+  void CalculeFuerza(Cuerpo * Planeta, int N, const double G);
+  void CalculeFuerzaEntre(Cuerpo &  Planeta1, Cuerpo & Planeta2, const double G);
 };
-void Colisionador::CalculeFuerza(Cuerpo * Planeta){
+void Colisionador::CalculeFuerza(Cuerpo * Planeta, int N, const double G){
   int i,j;
   for(i=0;i<N;i++)
     Planeta[i].BorreFuerza();
   for(i=0;i<N;i++)
     for(j=i+1;j<N;j++)
-      CalculeFuerzaEntre(Planeta[i],Planeta[j]);
+      CalculeFuerzaEntre(Planeta[i],Planeta[j], G);
 }
-void Colisionador::CalculeFuerzaEntre(Cuerpo & Planeta1, Cuerpo &Planeta2){
+void Colisionador::CalculeFuerzaEntre(Cuerpo & Planeta1, Cuerpo & Planeta2, const double G){
   vector3D r21,n,F1; double d21,F;
   r21 = Planeta2.r - Planeta1.r; d21=r21.norm(); n=r21/d21;
   F = G*Planeta1.m*Planeta2.m*pow(d21,-2.0);

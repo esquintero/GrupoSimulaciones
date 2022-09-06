@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cmath>
-#include "../vector.h"
 #include "planetas_lib.h"
 #include <fstream>
 /////////////////////////////////////////////////////////////////
@@ -58,16 +57,16 @@ int main(){
 	     <<Planeta[2].Getx()<<" "<<Planeta[2].Gety()<<std::endl;
     // Haga el movimiento y los calculos por PEFRL
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1 
-    Newton.CalculeFuerza(Planeta);
+    Newton.CalculeFuerza(Planeta,N,G);
     for(i=0;i<N;i++) Planeta[i].Mueva_v(dt,Coeficiente1);     // 2
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Chi);             // 3
-    Newton.CalculeFuerza(Planeta);     
+    Newton.CalculeFuerza(Planeta,N,G);     
     for(i=0;i<N;i++) Planeta[i].Mueva_v(dt,Lambda);           // 4
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt,Coeficiente2);     // 5
-    Newton.CalculeFuerza(Planeta);     
+    Newton.CalculeFuerza(Planeta,N,G);     
     for(i=0;i<N;i++) Planeta[i].Mueva_v(dt,Lambda);           // 4
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Chi);             // 3
-    Newton.CalculeFuerza(Planeta);
+    Newton.CalculeFuerza(Planeta,N,G);
     for(i=0;i<N;i++) Planeta[i].Mueva_v(dt,Coeficiente1);     // 2
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1
   }
