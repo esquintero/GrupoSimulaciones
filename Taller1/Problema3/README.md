@@ -7,5 +7,8 @@ El objetivo es hacer que todo corra automáticamente, para ello los archivos ```
 
 Para correr el primer item hacer
 ```
-run.sh
+make Sol_Jupiter
 ```
+Limpiar al final usando
+```
+make clean
