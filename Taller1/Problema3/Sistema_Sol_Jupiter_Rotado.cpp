@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "planetas_lib.h"
+#include <ofstream>
 /////////////////////////////////////////////////////////////////
 //Dos Cuerpos Celestes - metodo de integracion PEFRL           //
 //                                                             //
@@ -12,6 +13,8 @@
 //                                                             //
 // m_sol = 1047 m_jupiter    ,  r_sol = 9.73 r_jupiter         //
 // m_jupiter = 1             ,  r_jupiter = 1                  //
+//                                                             //
+// En un sistema rotado. R = [[Ctheta,-Stheta],[Stheta,Ctheta]]//
 //                                                             //
 /////////////////////////////////////////////////////////////////
 const double G=1.0;
@@ -36,7 +39,9 @@ int main(){
   double t,tmax=1.1*T, dt=0.01;
   double tdibujo, tcuadro=T/100;
   int i;
+  std::ofstream outfile;
 
+  outfile.open("S-J_rotated_axis.dat");
   Planeta[0].Inicie(x1,0,0,0,V1,0,m1,97.3);
   Planeta[1].Inicie(x2,0,0,0,V2,0,m2,10.0);
   
@@ -49,8 +54,8 @@ int main(){
     double xrotado_1= Planeta[1].Getx()*cos(omega*t)+Planeta[1].Gety()*sin(omega*t);
     double yrotado_1=-Planeta[1].Getx()*sin(omega*t)+Planeta[1].Gety()*cos(omega*t);
     
-    std::cout<<xrotado_0<<" "<<yrotado_0<<" ";
-    std::cout<<xrotado_1<<" "<<yrotado_1<<"\n";
+    outfile<<xrotado_0<<" "<<yrotado_0<<" "
+	   <<xrotado_1<<" "<<yrotado_1<<"\n";
     // Haga el movimiento y los calculos por PEFRL
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1 
     Newton.CalculeFuerza(Planeta,N,G);
