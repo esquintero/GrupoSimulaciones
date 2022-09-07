@@ -46,8 +46,7 @@ int main(){
   Planeta[1].Inicie(x2, 0,0,  0, V2,0,m2,10.0); // Júpiter
   for(t=0,tdibujo=0; t<tmax; t+=dt, tdibujo+=dt){
     outfile<<Planeta[0].Getx()<<" "<<Planeta[0].Gety()<<" "
-	     <<Planeta[1].Getx()<<" "<<Planeta[1].Gety()<<" "
-	     <<Planeta[2].Getx()<<" "<<Planeta[2].Gety()<<std::endl;
+	   <<Planeta[1].Getx()<<" "<<Planeta[1].Gety()<<std::endl;
     // Haga el movimiento y los calculos por PEFRL
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1 
     Newton.CalculeFuerza(Planeta,N,G);

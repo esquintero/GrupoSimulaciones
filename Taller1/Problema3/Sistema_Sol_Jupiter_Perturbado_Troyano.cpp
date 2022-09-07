@@ -45,7 +45,7 @@ int main(){
   int i;
   std::ofstream outfile;
 
-  outfile.open("S-J-T_original_axis.dat");
+  outfile.open("S-J-T_perturbated.dat");
 
   Planeta[0].Inicie(x1, 0,0,  0, V1,0,m1,97.3); // Sol
   Planeta[1].Inicie(x2, 0,0,  0, V2,0,m2,10.0); // Júpiter
