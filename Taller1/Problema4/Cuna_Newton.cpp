@@ -10,7 +10,7 @@ void TermineCuadro(void);
 // Constantes globales en CGS
 const int N = 3; // # péndulos
 const double g = 980;
-const double K = 1e9;
+const double K = 10.0e10;
 
 // Constantes PEFRL
 const double Zeta=0.1786178958448091e00;
@@ -102,6 +102,7 @@ void Colisionador::CalculeTorqueEntre(Cuerpo & Pendulo1, Cuerpo & Pendulo2)
   Pendulo1.SumeTorque(F*Pendulo1.l);
   Pendulo2.SumeTorque(-F*Pendulo2.l);
 }
+
 // ----------------------------------------------------
 int main()
 {
@@ -109,7 +110,7 @@ int main()
   Colisionador Hertz;
   double m0 = 100, l0 = 12, R0 = 1.5 ;
   double T = 2*M_PI*sqrt(l0/g);
-  double t, tmax = 3*T, dt = 0.0001;
+  double t, tmax = 1.0*T, dt = 0.0001;
   double tdibujo, tcuadro = T/100;
   int i;
 
@@ -121,16 +122,17 @@ int main()
   }
 
   // Dibujos
-  InicieAnimacion();
+  //InicieAnimacion();
 
    for(t=0,tdibujo=0; t<tmax; t+=dt,tdibujo+=dt){
     //Dibujar
-     if(tdibujo>tcuadro){
-       InicieCuadro();
-       for(i=0;i<N;i++) Pendulo[i].Dibujese();
-       TermineCuadro();
-       tdibujo=0;
-     }         
+     // if(tdibujo>tcuadro){
+     //   InicieCuadro();
+     //   for(i=0;i<N;i++) Pendulo[i].Dibujese();
+     //   TermineCuadro();
+     //   tdibujo=0;
+     // }
+     
     
     //cout<<Pendulo[1].Getx()<<" "<<Pendulo[1].Gety()<<endl;
     // Mover por PEFRL
@@ -146,7 +148,10 @@ int main()
      for(i=0;i<N;i++) Pendulo[i].Mueva_theta(dt,Chi);
      Hertz.CalculeTorques(Pendulo);
      for(i=0;i<N;i++) Pendulo[i].Mueva_omega(dt,Coeficiente1);
-     for(i=0;i<N;i++) Pendulo[i].Mueva_theta(dt,Zeta);   
+     for(i=0;i<N;i++) Pendulo[i].Mueva_theta(dt,Zeta);
+
+     //P4a, Torque del pendulo de la mitad
+     cout << t << " " << Pendulo[1].Gettau() << endl;
    }
 
    return 0;
@@ -169,4 +174,5 @@ void InicieCuadro(void){
 void TermineCuadro(void){
     cout<<endl;
 }
+
 
