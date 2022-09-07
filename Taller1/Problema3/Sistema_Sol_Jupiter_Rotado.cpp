@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "planetas_lib.h"
-#include <ofstream>
+#include <fstream>
 /////////////////////////////////////////////////////////////////
 //Dos Cuerpos Celestes - metodo de integracion PEFRL           //
 //                                                             //
