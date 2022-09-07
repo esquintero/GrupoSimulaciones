@@ -40,17 +40,16 @@ int main(){
   double omega = sqrt(G*M/pow(r,3.0)), T=2*M_PI/omega, V1=omega*x1, V2=omega*x2;
   double Vx3=-V2*sin(theta), Vy3=V1*cos(theta);
   double t, dt=0.01;
-  double tmax=21*T;
+  double tmax=1.1*T;
   double tdibujo, tcuadro=T/100;
   int i;
   std::ofstream outfile;
 
-  outfile.open("S-J_original_axis_Troyano.dat");
+  outfile.open("S-J-T_original_axis.dat");
 
   Planeta[0].Inicie(x1, 0,0,  0, V1,0,m1,97.3); // Sol
   Planeta[1].Inicie(x2, 0,0,  0, V2,0,m2,10.0); // Júpiter
-  //  Planeta[2].Inicie(x3,y3,0,Vx3,Vy3,0,m3, 1.0); // Planeta Troyano
-  Planeta[2].Inicie(x3*0.009,y3*0.008,0,Vx3,Vy3,0,m3, 1.0); // Planeta Troyano Perturbado
+  Planeta[2].Inicie(x3,y3,0,Vx3*0.999,Vy3*0.888,0,m3, 1.0); // Planeta Troyano Perturbado
   for(t=0,tdibujo=0; t<tmax; t+=dt, tdibujo+=dt){
     outfile<<Planeta[0].Getx()<<" "<<Planeta[0].Gety()<<" "
 	     <<Planeta[1].Getx()<<" "<<Planeta[1].Gety()<<" "
