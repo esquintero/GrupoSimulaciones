@@ -37,7 +37,7 @@ int main(){
     double dr=0.1;
     ofstream outfile;
     //outfile.open("C:/Users/maldi/AppData/Local/Packages/CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc/LocalState/rootfs/home/dav/simmetods/2_a.dat");
-    outfile.open("T1_P2_av3.dat");
+    outfile.open("T1_P2_bv3.dat");
     for(l=0.1;l<15;l+=0.01){
         for(r=0.2,R1=0,R2=1;r<10;r+=0.1){
             
