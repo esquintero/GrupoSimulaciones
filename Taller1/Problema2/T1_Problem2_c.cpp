@@ -33,13 +33,13 @@ void RungeKuttaStep4(double & r0, double & l0, double & R10, double & R20, doubl
     //r0+=dr;
 }
 
-double R(double lf){
+double R(double rf,double lf){
     double r,l,R1,R2,result=0; //initial conditions
     double dr=0.01;
     for(l=0.1;l<=15;l+=0.01){
         for(r=0.01,R1=0,R2=1;r<=10;r+=0.01){
             
-            if(r>0.999 && r<1.001){
+            if(r>rf-0.01 && r<rf+0.01){
                 if(l>lf-0.01 && l<lf+0.01)
                     result=R2;
             }
@@ -52,10 +52,10 @@ return result;
 
 double ZerosBi(double a, double b){
     double m, fa, fm;
-
-    fa=R(a);
+    //Calculated for a function with r=1
+    fa=R(1,a);
     while(b-a >= ErrMax){
-        m = (b+a)/2; fm=R(m);
+        m = (b+a)/2; fm=R(1,m);
         if(fa*fm>0)
         {a=m; fa=fm;}
         else
@@ -65,9 +65,36 @@ double ZerosBi(double a, double b){
 }
 
 int main(){
-    cout<<"El primer cero está en "<<ZerosBi(0.5,4)<<endl;
-    cout<<"El segundo cero está en "<<ZerosBi(4,8)<<endl;
-    cout<<"El tercer cero está en "<<ZerosBi(8,12)<<endl;
-    cout<<"El cuarto cero está en "<<ZerosBi(12,15)<<endl;
+    double zero1=ZerosBi(0.5,4);
+    double zero2=ZerosBi(4,8);
+    double zero3=ZerosBi(8,12);
+    double zero4=ZerosBi(12,15);
+    cout<<"El primer cero está en "<<zero1<<endl;
+    cout<<"El segundo cero está en "<<zero2<<endl;
+    cout<<"El tercer cero está en "<<zero3<<endl;
+    cout<<"El cuarto cero está en "<<zero4<<endl;
+    ofstream outfile;
+    //for zero1
+    outfile.open("T1_P2_c_zero1.dat");
+    double r;
+    for(r=0.01;r<=1;r+=0.01){
+        outfile <<r<<"\t"<<R(r,zero1)<<endl;
+    }
+    outfile.close(); 
+    outfile.open("T1_P2_c_zero2.dat");
+    for(r=0.01;r<=1;r+=0.01){
+        outfile <<r<<"\t"<<R(r,zero2)<<endl;
+    }
+    outfile.close(); 
+    outfile.open("T1_P2_c_zero3.dat");
+    for(r=0.01;r<=1;r+=0.01){
+        outfile <<r<<"\t"<<R(r,zero3)<<endl;
+    }
+    outfile.close(); 
+    outfile.open("T1_P2_c_zero4.dat");
+    for(r=0.01;r<=1;r+=0.01){
+        outfile <<r<<"\t"<<R(r,zero4)<<endl;
+    }
+    outfile.close(); 
 
 }
