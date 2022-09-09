@@ -110,7 +110,7 @@ int main()
   Colisionador Hertz;
   double m0 = 100, l0 = 12, R0 = 1.5 ;
   double T = 2*M_PI*sqrt(l0/g);
-  double t, tmax = 1.0*T, dt = 0.0001;
+  double t, tmax = 1.0*T, dt = 0.000001;
   double tdibujo, tcuadro = T/100;
   int i;
 

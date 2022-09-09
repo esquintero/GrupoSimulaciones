@@ -10,16 +10,16 @@ for i in range(8):
     filenumbers.append(x)
 filenames = filenumbers[7:-1]
 
-TodoslosK = np.zeros((6953, 7))
+TodoslosK = np.zeros((695277, 7))
 tiempo = np.loadtxt(
-    "c:/Users/Esteban/Desktop/Uni Esteban/Simulaciones/RepositorioGrupoSimulaciones/Taller1/Problema4/DatosP1aV2/"
+    "d:/Esteban/Uni Esteban/Simulaciones/RepositorioGrupoSimulaciones/Taller1/Problema4/DatosP1aV2/"
     + filenames[0],
     usecols=0,
 )
 
 for i in range(7):
     TodoslosK[:, i] = np.loadtxt(
-        "c:/Users/Esteban/Desktop/Uni Esteban/Simulaciones/RepositorioGrupoSimulaciones/Taller1/Problema4/DatosP1aV2/"
+        "d:/Esteban/Uni Esteban/Simulaciones/RepositorioGrupoSimulaciones/Taller1/Problema4/DatosP1aV2/"
         + filenames[i],
         usecols=1,
     )
@@ -30,5 +30,5 @@ print(filenames)
 plt.plot(tiempo, TodoslosK)
 plt.xlim(xmin=0.174, xmax=0.178)
 plt.savefig(
-    "c:/Users/Esteban/Desktop/Uni Esteban/Simulaciones/RepositorioGrupoSimulaciones/Taller1/Problema4/TorqueVStiempo"
+    "d:/Esteban/Uni Esteban/Simulaciones/RepositorioGrupoSimulaciones/Taller1/Problema4/TorqueVStiempo_mejorado.png"
 )
