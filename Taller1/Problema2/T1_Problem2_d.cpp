@@ -1,6 +1,11 @@
 #include <iostream>
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <string>
+#include <iomanip>
+#include <sstream>
+#include <fstream>
+
 
 using namespace std;
 const double ErrMax=1e-7;
@@ -53,8 +58,34 @@ int main(){
     double alpha=0;
     double r=1; 
     double l;
-    cout<<"El primer cero está en "<<ZerosBi(alpha,r,l,0.01,4)<<endl;
-    cout<<"El segundo cero está en "<<ZerosBi(alpha,r,l,4,8)<<endl;
-    cout<<"El tercer cero está en "<<ZerosBi(alpha,r,l,8,12)<<endl;
-    cout<<"El cuarto cero está en "<<ZerosBi(alpha,r,l,12,15)<<endl;
+    double zero1=ZerosBi(alpha,r,l,0.01,4);
+    double zero2=ZerosBi(alpha,r,l,4,8);
+    double zero3=ZerosBi(alpha,r,l,8,12);
+    double zero4=ZerosBi(alpha,r,l,12,15);
+    cout<<"El primer cero está en "<<zero1<<endl;
+    cout<<"El segundo cero está en "<<zero2<<endl;
+    cout<<"El tercer cero está en "<<zero3<<endl;
+    cout<<"El cuarto cero está en "<<zero4<<endl;
+
+    ofstream outfile;
+    outfile.open("T1_P2_d_zero1.dat");
+    for(r=0.01;r<=1;r+=0.01){
+        outfile <<r<<"\t"<<Bessel(alpha,r,zero1)<<endl;
+    }
+    outfile.close();
+    outfile.open("T1_P2_d_zero2.dat");
+    for(r=0.01;r<=1;r+=0.01){
+        outfile <<r<<"\t"<<Bessel(alpha,r,zero2)<<endl;
+    }
+    outfile.close();
+    outfile.open("T1_P2_d_zero3.dat");
+    for(r=0.01;r<=1;r+=0.01){
+        outfile <<r<<"\t"<<Bessel(alpha,r,zero3)<<endl;
+    }
+    outfile.close();
+    outfile.open("T1_P2_d_zero4.dat");
+    for(r=0.01;r<=1;r+=0.01){
+        outfile <<r<<"\t"<<Bessel(alpha,r,zero4)<<endl;
+    }
+    outfile.close();
 }
