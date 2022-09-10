@@ -33,7 +33,7 @@ void RungeKuttaStep4(double & r0, double & l0, double & R10, double & R20, doubl
 }
 
 int main(){
-    double r,l,R1,R2; //initial conditions
+    double r,l,R1,R2; 
     double dr=0.01;
     ofstream outfile;
     outfile.open("T1_P2_av2.dat");

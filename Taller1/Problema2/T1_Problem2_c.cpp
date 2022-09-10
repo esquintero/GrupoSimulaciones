@@ -9,7 +9,6 @@ using namespace std;
 
 //Problem 2 - c .
 
-//We write the equation as two coupled equations
 
 const double ErrMax=1e-7;
 
@@ -30,11 +29,11 @@ void RungeKuttaStep4(double & r0, double & l0, double & R10, double & R20, doubl
     dR41=f1(r0+dr,l0,R10+dR31,R20+dR32)*dr;          dR42=f2(r0+dr,l0,R10+dR31,R20+dR32)*dr;
 
     R10+=(dR11+2*(dR21+dR31)+dR41)/6;             R20+=(dR12+2*(dR22+dR32)+dR42)/6;
-    //r0+=dr;
+   
 }
 
 double R(double rf,double lf){
-    double r,l,R1,R2,result=0; //initial conditions
+    double r,l,R1,R2,result=0; 
     double dr=0.01;
     for(l=0.1;l<=15;l+=0.01){
         for(r=0.01,R1=0,R2=1;r<=10;r+=0.01){
@@ -74,7 +73,6 @@ int main(){
     cout<<"El tercer cero está en "<<zero3<<endl;
     cout<<"El cuarto cero está en "<<zero4<<endl;
     ofstream outfile;
-    //for zero1
     outfile.open("T1_P2_c_zero1.dat");
     double r;
     for(r=0.01;r<=1;r+=0.01){
