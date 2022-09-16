@@ -31,9 +31,9 @@ const double Chi    = -0.6626458266981849e-1;
 const double Coeficiente1 =(1-2*Lambda)/2;
 const double Coeficiente2 =1-2*(Chi+Zeta);
 
-// Clases
+/*/ Clases
 class Cuerpo;
-class Colisionador;
+class Colisionador;*/
 int main(){
   Cuerpo Planeta[N];
   Colisionador Newton;
@@ -41,9 +41,10 @@ int main(){
   double theta=M_PI/3;
   double M=m1+m2, x1=-m2*r/M, x2=m1*r/M, x3=x2*cos(theta),y3=x2*sin(theta);
   double omega = sqrt(G*M/pow(r,3.0)), T=2*M_PI/omega, V1=omega*x1, V2=omega*x2;
-  double Vx3=-V2*sin(theta), Vy3=V1*cos(theta);
+  //double Vx3=-V2*cos((M_PI/2)-theta), Vy3=V2*sin((M_PI/2)-theta); //otra forma de verlo
+  double Vx3=-V2*sin(theta), Vy3=V2*cos(theta);
   double t, dt=0.01;
-  double tmax=1.1*T;
+  double tmax=21.1*T;
   double tdibujo, tcuadro=T/100;
   int i;
   std::ofstream outfile;
@@ -54,28 +55,35 @@ int main(){
   Planeta[1].Inicie(x2, 0,0,  0, V2,0,m2,10.0); // Júpiter
   Planeta[2].Inicie(x3,y3,0,Vx3,Vy3,0,m3, 1.0); // Planeta Troyano
 
-  double xrotado_0= Planeta[0].Getx()*cos(omega*t)+Planeta[0].Gety()*sin(omega*t);
-  double yrotado_0=-Planeta[0].Getx()*sin(omega*t)+Planeta[0].Gety()*cos(omega*t);
 
-  double xrotado_1= Planeta[1].Getx()*cos(omega*t)+Planeta[1].Gety()*sin(omega*t);
-  double yrotado_1=-Planeta[1].Getx()*sin(omega*t)+Planeta[1].Gety()*cos(omega*t);
-
-  double xrotado_2= Planeta[2].Getx()*cos(omega*t)+Planeta[2].Gety()*sin(omega*t);
-  double yrotado_2=-Planeta[2].Getx()*sin(omega*t)+Planeta[2].Gety()*cos(omega*t);
-  
   for(t=0,tdibujo=0; t<tmax; t+=dt, tdibujo+=dt){
+
+    double xrotado_0= Planeta[0].Getx()*cos(omega*t)+Planeta[0].Gety()*sin(omega*t);
+    double yrotado_0=-Planeta[0].Getx()*sin(omega*t)+Planeta[0].Gety()*cos(omega*t);
+
+    double xrotado_1= Planeta[1].Getx()*cos(omega*t)+Planeta[1].Gety()*sin(omega*t);
+    double yrotado_1=-Planeta[1].Getx()*sin(omega*t)+Planeta[1].Gety()*cos(omega*t);
+
+    double xrotado_2= Planeta[2].Getx()*cos(omega*t)+Planeta[2].Gety()*sin(omega*t);
+    double yrotado_2=-Planeta[2].Getx()*sin(omega*t)+Planeta[2].Gety()*cos(omega*t);
+
+    //Opcional para graficar en sistema de referencia inercial
+    /*outfile<<Planeta[0].Getx()<<" "<<Planeta[0].Gety()<<" "
+           <<Planeta[1].Getx()<<" "<<Planeta[1].Gety()<<" "
+           <<Planeta[2].Getx()<<" "<<Planeta[2].Gety()<<std::endl;*/
+
     outfile<<xrotado_0<<" "<<yrotado_0<<" "
 	   <<xrotado_1<<" "<<yrotado_1<<" "
 	   <<xrotado_2<<" "<<yrotado_2<<std::endl;
     // Haga el movimiento y los calculos por PEFRL
-    for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1 
+    for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1
     Newton.CalculeFuerza(Planeta,N,G);
     for(i=0;i<N;i++) Planeta[i].Mueva_v(dt,Coeficiente1);     // 2
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Chi);             // 3
-    Newton.CalculeFuerza(Planeta,N,G);     
+    Newton.CalculeFuerza(Planeta,N,G);
     for(i=0;i<N;i++) Planeta[i].Mueva_v(dt,Lambda);           // 4
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt,Coeficiente2);     // 5
-    Newton.CalculeFuerza(Planeta,N,G);     
+    Newton.CalculeFuerza(Planeta,N,G);
     for(i=0;i<N;i++) Planeta[i].Mueva_v(dt,Lambda);           // 4
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Chi);             // 3
     Newton.CalculeFuerza(Planeta,N,G);

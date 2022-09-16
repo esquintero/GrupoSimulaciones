@@ -46,7 +46,7 @@ int main(){
   int i;
   std::ofstream outfile;
 
-  outfile.open("S-J-T_perturbated.dat");
+  outfile.open("S-J-T_perturbated_periodos.dat");
 
   Planeta[0].Inicie(x1, 0,0,  0, V1,0,m1,97.3); // Sol
   Planeta[1].Inicie(x2, 0,0,  0, V2,0,m2,10.0); // Júpiter
@@ -64,15 +64,8 @@ int main(){
     double xrotado_2= Planeta[2].Getx()*cos(omega*t)+Planeta[2].Gety()*sin(omega*t);
     double yrotado_2=-Planeta[2].Getx()*sin(omega*t)+Planeta[2].Gety()*cos(omega*t);
 
-    //Opcional para graficar en sistema de referencia inercial
-    /*outfile<<Planeta[0].Getx()<<" "<<Planeta[0].Gety()<<" "
-           <<Planeta[1].Getx()<<" "<<Planeta[1].Gety()<<" "
-           <<Planeta[2].Getx()<<" "<<Planeta[2].Gety()<<std::endl;*/
+    outfile<<xrotado_2<<" "<<t<<std::endl;
 
-    outfile<<xrotado_0<<" "<<yrotado_0<<" "
-	   <<xrotado_1<<" "<<yrotado_1<<" "
-	   <<xrotado_2<<" "<<yrotado_2<<std::endl;
-     
     // Haga el movimiento y los calculos por PEFRL
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1
     Newton.CalculeFuerza(Planeta,N,G);

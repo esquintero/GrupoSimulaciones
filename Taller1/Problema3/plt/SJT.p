@@ -1,4 +1,7 @@
 set terminal png size 500,500
+set size square
+set xrange [-1500:1500]
+set yrange [-1500:1500]
 set grid
 set output '../img/SJT_c.png'
 set title 'Sol Jupiter Troyano'

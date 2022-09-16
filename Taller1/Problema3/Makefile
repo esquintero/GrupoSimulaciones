@@ -12,6 +12,9 @@ SJT_p:
 	g++ Sistema_Sol_Jupiter_Perturbado_Troyano.cpp -o perturbado.out && ./perturbado.out
 	cd plt && gnuplot SJT_p.p && cd ../
 
+SJT_p_periodos:
+	g++ Sistema_Sol_Jupiter_Perturbado_Troyano_Periodos.cpp -o perturbado_periodos.out && ./perturbado_periodos.out
+	cd plt && gnuplot SJT_p_periodos.p && cd ../
 clean:
 	rm -f *.out *~ *# *.dat
 	clear
