@@ -64,7 +64,7 @@ int main(){
     double xrotado_2= Planeta[2].Getx()*cos(omega*t)+Planeta[2].Gety()*sin(omega*t);
     double yrotado_2=-Planeta[2].Getx()*sin(omega*t)+Planeta[2].Gety()*cos(omega*t);
 
-    outfile<<xrotado_2<<" "<<t<<std::endl;
+    outfile<<t<<" "<<xrotado_2<<std::endl;
 
     // Haga el movimiento y los calculos por PEFRL
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1

@@ -44,7 +44,7 @@ int main(){
   outfile.open("S-J_rotated_axis.dat");
   Planeta[0].Inicie(x1,0,0,0,V1,0,m1,97.3);
   Planeta[1].Inicie(x2,0,0,0,V2,0,m2,10.0);
-  
+
   //InicieAnimacion();
   for(t=0,tdibujo=0; t<tmax; t+=dt, tdibujo+=dt){
 
@@ -53,18 +53,18 @@ int main(){
 
     double xrotado_1= Planeta[1].Getx()*cos(omega*t)+Planeta[1].Gety()*sin(omega*t);
     double yrotado_1=-Planeta[1].Getx()*sin(omega*t)+Planeta[1].Gety()*cos(omega*t);
-    
+
     outfile<<xrotado_0<<" "<<yrotado_0<<" "
 	   <<xrotado_1<<" "<<yrotado_1<<"\n";
     // Haga el movimiento y los calculos por PEFRL
-    for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1 
+    for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1
     Newton.CalculeFuerza(Planeta,N,G);
     for(i=0;i<N;i++) Planeta[i].Mueva_v(dt,Coeficiente1);     // 2
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Chi);             // 3
-    Newton.CalculeFuerza(Planeta,N,G);     
+    Newton.CalculeFuerza(Planeta,N,G);
     for(i=0;i<N;i++) Planeta[i].Mueva_v(dt,Lambda);           // 4
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt,Coeficiente2);     // 5
-    Newton.CalculeFuerza(Planeta,N,G);     
+    Newton.CalculeFuerza(Planeta,N,G);
     for(i=0;i<N;i++) Planeta[i].Mueva_v(dt,Lambda);           // 4
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Chi);             // 3
     Newton.CalculeFuerza(Planeta,N,G);

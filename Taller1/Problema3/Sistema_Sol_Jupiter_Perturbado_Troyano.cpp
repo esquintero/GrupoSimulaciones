@@ -72,7 +72,7 @@ int main(){
     outfile<<xrotado_0<<" "<<yrotado_0<<" "
 	   <<xrotado_1<<" "<<yrotado_1<<" "
 	   <<xrotado_2<<" "<<yrotado_2<<std::endl;
-     
+
     // Haga el movimiento y los calculos por PEFRL
     for(i=0;i<N;i++) Planeta[i].Mueva_r(dt, Zeta);            // 1
     Newton.CalculeFuerza(Planeta,N,G);
