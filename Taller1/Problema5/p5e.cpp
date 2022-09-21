@@ -66,7 +66,7 @@ public:
   void CalculeFuerzas(Cuerpo * Grano);
   void CalculeFuerzaEntre(Cuerpo & Grano1, Cuerpo & Grano2);
   void CalculeFuerzaPared(Cuerpo & Grano1);
-  void CalculeFuerzaChoque(Cuerpo & Grano1, Cuerpo & Grano2);
+  //void CalculeFuerzaChoque(Cuerpo & Grano1, Cuerpo & Grano2);
 };
 
 void Colisionador::CalculeFuerzas(Cuerpo * Grano){
@@ -84,7 +84,7 @@ void Colisionador::CalculeFuerzas(Cuerpo * Grano){
   for(i=0;i<N;i++)
     for(j=i+1;j<N;j++){
       CalculeFuerzaEntre(Grano[i], Grano[j]);
-      CalculeFuerzaChoque(Grano[i], Grano [j]);
+      //CalculeFuerzaChoque(Grano[i], Grano [j]);
     }
 }
 
@@ -141,13 +141,17 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
 //Fuerza de Lennard Jones entre dos moleculas
 
 void Colisionador::CalculeFuerzaEntre(Cuerpo & Grano1,Cuerpo & Grano2){
-  vector3D r21,n,F2; double s,d21,F;
-  r21=Grano2.r-Grano1.r; d21=r21.norm(); n=r21/d21;
-  // s=Grano1.R+Grano2.R;
-  F=12*E/d21*(pow(r0/d21,12)-pow(r0/d21,6));
-  F2=F*n; Grano2.AdicioneFuerza(F2); Grano1.AdicioneFuerza(F2*(-1));
+  vector3D r21=Grano2.r-Grano1.r;
+  double d=r21.norm(),s=Grano1.R+Grano2.R-d;
+  if(s>0){
+    vector3D n=r21*(1.0/d);
+    vector3D F2=n*12*E/d*(pow(r0/d,12)-pow(r0/d,6));
+    Grano2.AdicioneFuerza(F2);   Grano1.AdicioneFuerza(F2*(-1));
+  }
+ 
 }
 
+/*
 
 //Fuerza normal elástica
 void Colisionador::CalculeFuerzaChoque(Cuerpo & Grano1, Cuerpo & Grano2){
@@ -159,7 +163,7 @@ void Colisionador::CalculeFuerzaChoque(Cuerpo & Grano1, Cuerpo & Grano2){
     Grano2.AdicioneFuerza(F2);   Grano1.AdicioneFuerza(F2*(-1));
   }   
 }
-
+*/
 
 
 //----------------- Funciones de Animacion ----------
@@ -195,13 +199,12 @@ int main(void){
   Crandom ran64(1);
   double m0=1.0, R0=2.5, kT=10, V0=sqrt(2*kT/m0);
   int i,ix,iy;
-  double t,tdibujo,tmax=200,/*tmax=10*(Lx/V0),*/ tcuadro=tmax/1000,dt=0.001;
+  double t,tdibujo,tmax=400,/*tmax=10*(Lx/V0),*/ tcuadro=tmax/1000,dt=0.001;
   //double dx=Lx/(Nx+1), dy=Ly/(Ny+1);
   double Theta;
   double y, yprom;
   
-  
-  InicieAnimacion(); 
+ 
  
   //Inicializar las moléculas
   
