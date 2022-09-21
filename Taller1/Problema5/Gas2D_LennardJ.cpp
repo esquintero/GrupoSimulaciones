@@ -1,4 +1,4 @@
-// SIMULACIÓN DEL MOVIMIENTO DE N PARTÍCULAS BAJO EL INFLUJO DE UNA FUERZA DE LENNARD JONES, CONSIDERANDO LA GRAVEDAD Y FUERZAS REPULSIVAS GENERADAS POR LAS PAREDES  
+// SIMULACIÓN DEL MOVIMIENTO DE N PARTÍCULAS BAJO EL INFLUJO DE UNA FUERZA DE LENNARD JONES Y CONSIDERANDO FUERZAS REPULSIVAS GENERADAS POR LAS PAREDES  
 
 #include <iostream>
 #include <cmath>
@@ -7,7 +7,7 @@
 using namespace std;
 
 //---- declarar constantes ---
-const double g=9.8, K=1.0e4, Gamma=50, Kcundall=10, MU=0.4;
+const double K=1.0e4;
 const double Lx=60, Ly=120;
 const int Nx=5, Ny=5, N=Nx*Ny;
 
@@ -66,23 +66,26 @@ public:
   void CalculeFuerzas(Cuerpo * Grano);
   void CalculeFuerzaEntre(Cuerpo & Grano1, Cuerpo & Grano2);
   void CalculeFuerzaPared(Cuerpo & Grano1);
+  // void CalculeFuerzaChoque(Cuerpo & Grano1, Cuerpo & Grano2);
 };
 
 void Colisionador::CalculeFuerzas(Cuerpo * Grano){
-  int i,j; vector3D Fg;
+  int i,j;
+  
   //--- Borrar todas las fuerzas ---
   for(i=0;i<N;i++)
-    Grano[i].BorreFuerza(); 
-  //--- Sumar el peso ---
+    Grano[i].BorreFuerza();
+  
+  //--- Sumar la fuerza de la pared ---
   for(i=0;i<N;i++){
-    Fg.load(0,-Grano[i].m*g,0); 
-    Grano[i].AdicioneFuerza(Fg);
     CalculeFuerzaPared(Grano[i]);
   }
   //--- Calcular Fuerzas entre pares de granos ---
   for(i=0;i<N;i++)
-    for(j=i+1;j<N;j++)
+    for(j=i+1;j<N;j++){
       CalculeFuerzaEntre(Grano[i], Grano[j]);
+      // CalculeFuerzaChoque(Grano[i], Grano [j]);
+    }
 }
 
 
@@ -91,7 +94,7 @@ void Colisionador::CalculeFuerzas(Cuerpo * Grano){
 void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
   double x=Grano1.Getx(), y=Grano1.Gety();
   vector3D r=Grano1.r;
-  double h, K=1.0e4, d=r.norm(), R=Grano1.R;
+  double h, d=r.norm(), R=Grano1.R;
   vector3D n;
   
   //Pared de la izquierda
@@ -138,11 +141,30 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
 //Fuerza de Lennard Jones entre dos moleculas
 
 void Colisionador::CalculeFuerzaEntre(Cuerpo & Grano1,Cuerpo & Grano2){
-  vector3D r21,n,F2; double d21,F;
-  r21=Grano2.r-Grano1.r; d21=r21.norm(); n=r21/d21;
-  F=12*E/d21*(pow(r0/d21,12)-pow(r0/d21,6));
-  F2=F*n; Grano2.AdicioneFuerza(F2); Grano1.AdicioneFuerza(F2*(-1));
+  vector3D r21=Grano2.r-Grano1.r;
+  double d=r21.norm(),s=Grano1.R+Grano2.R-d;
+  if(s>0){
+    vector3D n=r21*(1.0/d);
+    vector3D F2=n*12*E/d*(pow(r0/d,12)-pow(r0/d,6));
+    Grano2.AdicioneFuerza(F2);   Grano1.AdicioneFuerza(F2*(-1));
+  }
+ 
 }
+
+/*
+//Fuerza normal elástica
+void Colisionador::CalculeFuerzaChoque(Cuerpo & Grano1, Cuerpo & Grano2){
+  vector3D r21=Grano2.r-Grano1.r;
+  double d=r21.norm(),s=Grano1.R+Grano2.R-d;
+  if(s>0){
+    vector3D n=r21*(1.0/d);
+    vector3D F2=n*(K*pow(s,1.5));
+    Grano2.AdicioneFuerza(F2);   Grano1.AdicioneFuerza(F2*(-1));
+  }   
+}
+*/
+
+
 
 
 

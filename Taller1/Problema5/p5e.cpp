@@ -1,4 +1,4 @@
-// SIMULACIÓN DEL MOVIMIENTO DE N PARTÍCULAS BAJO EL INFLUJO DE UNA FUERZA DE LENNARD JONES, CONSIDERANDO LA GRAVEDAD Y FUERZAS REPULSIVAS GENERADAS POR LAS PAREDES
+// SIMULACIÓN DEL MOVIMIENTO DE N PARTÍCULAS BAJO EL INFLUJO DE UNA FUERZA DE LENNARD JONES Y CONSIDERANDO FUERZAS REPULSIVAS GENERADAS POR LAS PAREDES  
 
 #include <iostream>
 #include <cmath>
@@ -7,7 +7,7 @@
 using namespace std;
 
 //---- declarar constantes ---
-const double g=9.8, K=1.0e4, Gamma=50;
+const double K=1.0e4;
 const double Lx=60, Ly=120;
 const int Nx=5, Ny=5, N=Nx*Ny;
 
@@ -54,11 +54,10 @@ void Cuerpo::Mueva_r(double dt, double Coeficiente){
 void Cuerpo::Mueva_V(double dt, double Coeficiente){
   V+=F*(Coeficiente*dt/m);  omega+=tau*(Coeficiente*dt/I);
 }
-/*void Cuerpo::Dibujese(void){
+void Cuerpo::Dibujese(void){
   cout<<" , "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)";
   // cout<<" , "<<r.x()<<"+"<<R*cos(theta)/7<<"*t,"<<r.y()<<"+"<<R*sin(theta)/7<<"*t";
-  }*/
-
+}
 
 //--- clase Colisionador ----
 class Colisionador{
@@ -67,23 +66,26 @@ public:
   void CalculeFuerzas(Cuerpo * Grano);
   void CalculeFuerzaEntre(Cuerpo & Grano1, Cuerpo & Grano2);
   void CalculeFuerzaPared(Cuerpo & Grano1);
+  void CalculeFuerzaChoque(Cuerpo & Grano1, Cuerpo & Grano2);
 };
 
 void Colisionador::CalculeFuerzas(Cuerpo * Grano){
-  int i,j; vector3D Fg;
+  int i,j;
+  
   //--- Borrar todas las fuerzas ---
   for(i=0;i<N;i++)
-    Grano[i].BorreFuerza(); 
-  //--- Sumar el peso ---
+    Grano[i].BorreFuerza();
+  
+  //--- Sumar la fuerza de la pared ---
   for(i=0;i<N;i++){
-    Fg.load(0,-Grano[i].m*g,0); 
-    Grano[i].AdicioneFuerza(Fg);
     CalculeFuerzaPared(Grano[i]);
   }
   //--- Calcular Fuerzas entre pares de granos ---
   for(i=0;i<N;i++)
-    for(j=i+1;j<N;j++)
+    for(j=i+1;j<N;j++){
       CalculeFuerzaEntre(Grano[i], Grano[j]);
+      CalculeFuerzaChoque(Grano[i], Grano [j]);
+    }
 }
 
 
@@ -92,62 +94,76 @@ void Colisionador::CalculeFuerzas(Cuerpo * Grano){
 void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
   double x=Grano1.Getx(), y=Grano1.Gety();
   vector3D r=Grano1.r;
-  double h, K=1.0e4, d=r.norm(), R=Grano1.R;
+  double h, d=r.norm(), R=Grano1.R;
   vector3D n;
   
-    //Pared de la izquierda
+  //Pared de la izquierda
   
-      if(x<R){
+  if(x<R){
     h=R-x;
     n.load(1,0,0);
     vector3D F=n*(K*pow(h,1.5));  
     Grano1.AdicioneFuerza(F);
-      }
-
-      //Pared de la derecha
-
-      if((x+R)>Lx){
-	h=R-(Lx-x);
+  }
+  
+  //Pared de la derecha
+  
+  if((x+R)>Lx){
+    h=R-(Lx-x);
     n.load(1,0,0);
     vector3D F=n*(K*pow(h,1.5));  
     Grano1.AdicioneFuerza(F*(-1));
-      }
-
-      //Pared de abajo
-
-      if(y<R){
+  }
+  
+  //Pared de abajo
+  
+  if(y<R){
 	 h=R-y;
-    n.load(0,1,0);
-    vector3D F=n*(K*pow(h,1.5));  
+	 n.load(0,1,0);
+	 vector3D F=n*(K*pow(h,1.5));  
     Grano1.AdicioneFuerza(F);
-      }
-
-
-      //Pared de arriba
-
-      if((y+R)>Ly){
-	h=R-(Ly-y);
+  }
+  
+  
+  //Pared de arriba
+  
+  if((y+R)>Ly){
+    h=R-(Ly-y);
     n.load(0,1,0);
     vector3D F=n*(K*pow(h,1.5));  
     Grano1.AdicioneFuerza(F*(-1));
-      }
-      
-}
+  }
   
+}
 
 
-//Fuerza entre moléculas de Lennard Jones
+
+//Fuerza de Lennard Jones entre dos moleculas
 
 void Colisionador::CalculeFuerzaEntre(Cuerpo & Grano1,Cuerpo & Grano2){
-  vector3D r21,n,F2; double d21,F;
+  vector3D r21,n,F2; double s,d21,F;
   r21=Grano2.r-Grano1.r; d21=r21.norm(); n=r21/d21;
+  // s=Grano1.R+Grano2.R;
   F=12*E/d21*(pow(r0/d21,12)-pow(r0/d21,6));
   F2=F*n; Grano2.AdicioneFuerza(F2); Grano1.AdicioneFuerza(F2*(-1));
 }
 
 
+//Fuerza normal elástica
+void Colisionador::CalculeFuerzaChoque(Cuerpo & Grano1, Cuerpo & Grano2){
+  vector3D r21=Grano2.r-Grano1.r;
+  double d=r21.norm(),s=Grano1.R+Grano2.R-d;
+  if(s>0){
+    vector3D n=r21*(1.0/d);
+    vector3D F2=n*(K*pow(s,1.5));
+    Grano2.AdicioneFuerza(F2);   Grano1.AdicioneFuerza(F2*(-1));
+  }   
+}
+
+
 
 //----------------- Funciones de Animacion ----------
+
 void InicieAnimacion(void){
   // cout<<"set terminal gif animate"<<endl; 
   //  cout<<"set output 'Gas2D.gif'"<<endl;
@@ -159,6 +175,7 @@ void InicieAnimacion(void){
   cout<<"set trange [0:7]"<<endl;
   cout<<"set isosamples 12"<<endl;  
 }
+
 void InicieCuadro(void){
     cout<<"plot 0,0 ";
     cout<<" , "<<Lx/7<<"*t,0";        //pared de abajo
@@ -166,6 +183,7 @@ void InicieCuadro(void){
     cout<<" , 0,"<<Ly/7<<"*t";        //pared de la izquierda
     cout<<" , "<<Lx<<","<<Ly/7<<"*t"; //pared de la derecha
 }
+
 void TermineCuadro(void){
     cout<<endl;
 }
@@ -182,26 +200,28 @@ int main(void){
   double Theta;
   double y, yprom;
   
-  //InicieAnimacion(); //Dibujar
   
-  
+  InicieAnimacion(); 
+ 
   //Inicializar las moléculas
   
   for(ix=0;ix<Nx;ix++)
     for(iy=0;iy<Ny;iy++){
       Theta=2*M_PI*ran64.r();//el ángulo de cada molécula respecto a x es aleatorio 
-      //--------------------(   x0,   y0,          Vx0,          Vy0, m0,R0,theta0,omega0)
-      Grano[Nx*iy+ix].Inicie((ix+1)*10,(iy+1)*10,V0*cos(Theta),V0*sin(Theta), m0,R0,0,1);
+      //--------------------(       x0,        y0,           Vx0,           Vy0, m0, R0,theta0,omega0)
+      Grano[Nx*iy+ix].Inicie((ix+1)*10, (iy+1)*10, V0*cos(Theta), V0*sin(Theta), m0, R0,     0, 1);
     }
   
-  for(t=0 ; t<tmax ; t+=dt){
+  for(t=0; t<tmax ; t+=dt){
     y=0;
     yprom=0;
-      for(i=0;i<N;i++) {
-	y+=Grano[i].Gety();
-	}
-      yprom=y/N;
-      cout<<t<<"\t"<<yprom<<"\n";
+
+    for(i=0;i<N;i++) {
+      y+=Grano[i].Gety();
+    }
+    yprom=y/N;
+    cout<<t<<"\t"<<yprom<<"\n";
+  
 
     //--- Muevase por PEFRL ---
     for(i=0;i<N;i++)Grano[i].Mueva_r(dt,epsilon);
@@ -220,7 +240,7 @@ int main(void){
 
   }   
 
-  
+ 
   
   return 0;
 }

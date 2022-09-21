@@ -6,7 +6,7 @@
 using namespace std;
 
 //Constantes globales
-const double E=1.0, KBT=0.5;
+const double E=1.0, KT=0.5;
 
 //Declaración de las clases
 class Cuerpo;
@@ -39,25 +39,24 @@ void Cuerpo::CalculeFuerza(double r0){
 
 
 void Cuerpo::Muevase(double dt){
-   x+=Vx*dt;     y+=Vy*dt;
-  Vx+=Fx/m*dt;  Vy+=Fy/m*dt;
+  x+=Vx*dt;     y+=Vy*dt;
+   Vx+=Fx/m*dt;  Vy+=Fy/m*dt;
 }
 
 //----------- Funciones Globales -----------
 int main(){
-  Cuerpo Planeta;
-  double r0=10,m0=1;
-  double omega,V0,T;
+  Cuerpo Particula;
+  double r0=10,m0=1,V0;
   double t,dt=0.001;
-
-  V0=sqrt(2*KBT/m0);
+  V0=sqrt(2*KT/m0);
   
   //------------(x0, y0, Vx0, Vy0, m0, R0)
-  Planeta.Inicie(r0,  0,   V0,   0, m0,2.5);
+  Particula.Inicie(r0,  0,   V0,   0, m0,2.5);
+  
   for(t=0;t<100;t+=dt){
-    cout<<t<<" "<<Planeta.Getx()<<" "<<Planeta.Gety()<<endl;
-    Planeta.CalculeFuerza(r0);
-    Planeta.Muevase(dt);
+    cout<<t<<" "<<Particula.Getx()<<endl;
+    Particula.CalculeFuerza(r0);
+    Particula.Muevase(dt);
   }
 
   return 0;
