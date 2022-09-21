@@ -1,4 +1,5 @@
-// Simular el movimiento de N granos con gravedad, fricción y choques inelásticos
+// SIMULACIÓN DEL MOVIMIENTO DE N PARTÍCULAS BAJO EL INFLUJO DE UNA FUERZA DE LENNARD JONES, CONSIDERANDO LA GRAVEDAD Y FUERZAS REPULSIVAS GENERADAS POR LAS PAREDES  
+
 #include <iostream>
 #include <cmath>
 #include "vector.h"
@@ -85,54 +86,56 @@ void Colisionador::CalculeFuerzas(Cuerpo * Grano){
 }
 
 
+//Implementación de la fuerzas repulsivas generadas por cada pared
+
 void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
   double x=Grano1.Getx(), y=Grano1.Gety();
   vector3D r=Grano1.r;
   double h, K=1.0e4, d=r.norm(), R=Grano1.R;
   vector3D n;
   
-    //Pared de la izquierda
+  //Pared de la izquierda
   
-      if(x<R){
+  if(x<R){
     h=R-x;
     n.load(1,0,0);
     vector3D F=n*(K*pow(h,1.5));  
     Grano1.AdicioneFuerza(F);
-      }
-
-      //Pared de la derecha
-
-      if((x+R)>Lx){
-	h=R-(Lx-x);
+  }
+  
+  //Pared de la derecha
+  
+  if((x+R)>Lx){
+    h=R-(Lx-x);
     n.load(1,0,0);
     vector3D F=n*(K*pow(h,1.5));  
     Grano1.AdicioneFuerza(F*(-1));
-      }
-
-      //Pared de abajo
-
-      if(y<R){
+  }
+  
+  //Pared de abajo
+  
+  if(y<R){
 	 h=R-y;
-    n.load(0,1,0);
-    vector3D F=n*(K*pow(h,1.5));  
+	 n.load(0,1,0);
+	 vector3D F=n*(K*pow(h,1.5));  
     Grano1.AdicioneFuerza(F);
-      }
-
-
-      //Pared de arriba
-
-      if((y+R)>Ly){
-	h=R-(Ly-y);
+  }
+  
+  
+  //Pared de arriba
+  
+  if((y+R)>Ly){
+    h=R-(Ly-y);
     n.load(0,1,0);
     vector3D F=n*(K*pow(h,1.5));  
     Grano1.AdicioneFuerza(F*(-1));
-      }
-      
-}
+  }
   
+}
 
 
-//Fuerza entre moléculas de Lennard Jones
+
+//Fuerza de Lennard Jones entre dos moleculas
 
 void Colisionador::CalculeFuerzaEntre(Cuerpo & Grano1,Cuerpo & Grano2){
   vector3D r21,n,F2; double d21,F;
@@ -143,9 +146,8 @@ void Colisionador::CalculeFuerzaEntre(Cuerpo & Grano1,Cuerpo & Grano2){
 
 
 
-
-
 //----------------- Funciones de Animacion ----------
+
 void InicieAnimacion(void){
   // cout<<"set terminal gif animate"<<endl; 
   //  cout<<"set output 'Gas2D.gif'"<<endl;
@@ -157,6 +159,7 @@ void InicieAnimacion(void){
   cout<<"set trange [0:7]"<<endl;
   cout<<"set isosamples 12"<<endl;  
 }
+
 void InicieCuadro(void){
     cout<<"plot 0,0 ";
     cout<<" , "<<Lx/7<<"*t,0";        //pared de abajo
@@ -164,6 +167,7 @@ void InicieCuadro(void){
     cout<<" , 0,"<<Ly/7<<"*t";        //pared de la izquierda
     cout<<" , "<<Lx<<","<<Ly/7<<"*t"; //pared de la derecha
 }
+
 void TermineCuadro(void){
     cout<<endl;
 }
@@ -180,38 +184,24 @@ int main(void){
   double Theta;
   
   
-  InicieAnimacion(); //Dibujar
-  
-
-  /*//Inicializar las paredes
-  
-  double Rpared=100*Lx, Mpared=100*m0; //radio y masa de las paredes
-  //---------------(  x0,       y0,Vx0,Vy0,    m0,    R0, theta0,omega0) 
-  Grano[N+0].Inicie(Lx/2,Ly+Rpared,  0,  0,Mpared,Rpared,      0,     0); //Pared de arriba
-  Grano[N+1].Inicie(Lx/2,  -Rpared,  0,  0,Mpared,Rpared,      0,     0); //Pared de abajo
-  Grano[N+2].Inicie(Lx+Rpared,Ly/2,  0,  0,Mpared,Rpared,      0,     0); //Pared derecha
-  Grano[N+3].Inicie(  -Rpared,Ly/2,  0,  0,Mpared,Rpared,      0,     0); //Pared izquierda
-  */
-  
-  
+  InicieAnimacion(); 
+ 
   //Inicializar las moléculas
   
   for(ix=0;ix<Nx;ix++)
     for(iy=0;iy<Ny;iy++){
       Theta=2*M_PI*ran64.r();//el ángulo de cada molécula respecto a x es aleatorio 
-      //--------------------(   x0,   y0,          Vx0,          Vy0, m0,R0,theta0,omega0)
-      Grano[Nx*iy+ix].Inicie((ix+1)*10,(iy+1)*10,V0*cos(Theta),V0*sin(Theta), m0,R0,0,1);
+      //--------------------(       x0,        y0,           Vx0,           Vy0, m0, R0,theta0,omega0)
+      Grano[Nx*iy+ix].Inicie((ix+1)*10, (iy+1)*10, V0*cos(Theta), V0*sin(Theta), m0, R0,     0, 1);
     }
   
   for(t=0,tdibujo=0 ; t<tmax ; t+=dt,tdibujo+=dt){
     //Dibujar
-    if(tdibujo>tcuadro){
-      
+
+    if(tdibujo>tcuadro){ 
       InicieCuadro();
       for(i=0;i<N;i++) Grano[i].Dibujese();
-
-      TermineCuadro();
-      
+      TermineCuadro(); 
       tdibujo=0;
     }
 

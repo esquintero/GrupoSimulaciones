@@ -1,4 +1,5 @@
-// Simular el movimiento de N granos con gravedad, fricción y choques inelásticos
+// SIMULACIÓN DEL MOVIMIENTO DE N PARTÍCULAS BAJO EL INFLUJO DE UNA FUERZA DE LENNARD JONES, CONSIDERANDO LA GRAVEDAD Y FUERZAS REPULSIVAS GENERADAS POR LAS PAREDES
+
 #include <iostream>
 #include <cmath>
 #include "vector.h"
@@ -86,6 +87,8 @@ void Colisionador::CalculeFuerzas(Cuerpo * Grano){
 }
 
 
+//Implementación de la fuerzas repulsivas generadas por cada pared
+
 void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
   double x=Grano1.Getx(), y=Grano1.Gety();
   vector3D r=Grano1.r;
@@ -144,10 +147,8 @@ void Colisionador::CalculeFuerzaEntre(Cuerpo & Grano1,Cuerpo & Grano2){
 
 
 
-
-
 //----------------- Funciones de Animacion ----------
-/*void InicieAnimacion(void){
+void InicieAnimacion(void){
   // cout<<"set terminal gif animate"<<endl; 
   //  cout<<"set output 'Gas2D.gif'"<<endl;
   cout<<"unset key"<<endl;
@@ -167,7 +168,7 @@ void InicieCuadro(void){
 }
 void TermineCuadro(void){
     cout<<endl;
-}*/
+}
 
 //-----------  Programa Principal --------------  
 int main(void){
@@ -183,17 +184,6 @@ int main(void){
   
   //InicieAnimacion(); //Dibujar
   
-
-  /*//Inicializar las paredes
-  
-  double Rpared=100*Lx, Mpared=100*m0; //radio y masa de las paredes
-  //---------------(  x0,       y0,Vx0,Vy0,    m0,    R0, theta0,omega0) 
-  Grano[N+0].Inicie(Lx/2,Ly+Rpared,  0,  0,Mpared,Rpared,      0,     0); //Pared de arriba
-  Grano[N+1].Inicie(Lx/2,  -Rpared,  0,  0,Mpared,Rpared,      0,     0); //Pared de abajo
-  Grano[N+2].Inicie(Lx+Rpared,Ly/2,  0,  0,Mpared,Rpared,      0,     0); //Pared derecha
-  Grano[N+3].Inicie(  -Rpared,Ly/2,  0,  0,Mpared,Rpared,      0,     0); //Pared izquierda
-  */
-  
   
   //Inicializar las moléculas
   
@@ -204,23 +194,14 @@ int main(void){
       Grano[Nx*iy+ix].Inicie((ix+1)*10,(iy+1)*10,V0*cos(Theta),V0*sin(Theta), m0,R0,0,1);
     }
   
-  for(t=0/*tdibujo=0*/ ; t<tmax ; t+=dt/*,tdibujo+=dt*/){
-    //Dibujar
+  for(t=0 ; t<tmax ; t+=dt){
     y=0;
     yprom=0;
-    //if(tdibujo>tcuadro){
-     
-      //InicieCuadro();
-      for(i=0;i<N;i++) {//Grano[i].Dibujese();
+      for(i=0;i<N;i++) {
 	y+=Grano[i].Gety();
 	}
       yprom=y/N;
       cout<<t<<"\t"<<yprom<<"\n";
-      
-      //TermineCuadro();
-      
-      //tdibujo=0;
-      //}
 
     //--- Muevase por PEFRL ---
     for(i=0;i<N;i++)Grano[i].Mueva_r(dt,epsilon);
