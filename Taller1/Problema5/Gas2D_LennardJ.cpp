@@ -91,6 +91,8 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
   double h, d=r.norm(), R=Particula1.R;
   vector3D n;
   
+
+  
   //Pared de la izquierda
   
   if(x<R){

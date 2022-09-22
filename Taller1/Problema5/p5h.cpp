@@ -4,11 +4,13 @@
 #include <cmath>
 #include "vector.h"
 #include "Random64.h"
+#include <sstream>
+#include <fstream>
 using namespace std;
 
 //---- declarar constantes ---
 const double K=1.0e4;
-const double Lx=60, Ly=120;
+const double Lx=60, Ly=60;
 const int Nx=5, Ny=5, N=Nx*Ny;
 
 //Constantes de la Fuerza de Lennard Jones
@@ -28,75 +30,74 @@ class Colisionador;
 //---- clase cuerpo ---
 class Cuerpo{
 private:
-  vector3D r,V,F; double m,R; double theta,omega,tau; double I;
+  vector3D r,V,F; double m,R; 
 public:
-  void Inicie(double x0,double y0,double Vx0,double Vy0,double m0,double R0,
-	      double theta0,double omega0);
-  void BorreFuerza(){F.load(0,0,0); tau=0;};
+  void Inicie(double x0,double y0,double Vx0,double Vy0,double m0,double R0);
+  void BorreFuerza(){F.load(0,0,0);};
   void AdicioneFuerza(vector3D F0){F+=F0;};
-  void AdicioneTorque(double tau0){tau+=tau0;};
   void Mueva_r(double dt, double Coeficiente);
   void Mueva_V(double dt, double Coeficiente);
   void Dibujese(void);
   double Getx(void){return r.x();}; //inline
   double Gety(void){return r.y();}; //inline
-  double GetV(void){return V.x();};
-  double Gettheta(void){return theta;}; //inline
+  double GetVx(void){return V.x();};
+  double GetVy(void){return V.y();};
   friend class Colisionador;
 };
-void Cuerpo::Inicie(double x0,double y0,double Vx0,double Vy0,double m0,double R0,
-		    double theta0,double omega0){
-  r.load(x0,y0,0); V.load(Vx0,Vy0,0);  m=m0;  R=R0;
-  theta=theta0; omega=omega0; I=2.0/5*m*R*R;
+void Cuerpo::Inicie(double x0,double y0,double Vx0,double Vy0,double m0,double R0){
+  r.load(x0,y0,0); V.load(Vx0,Vy0,0);  m=m0;  R=R0; 
 } 
 void Cuerpo::Mueva_r(double dt, double Coeficiente){
-  r+=V*(Coeficiente*dt);  theta+=omega*(Coeficiente*dt);
+  r+=V*(Coeficiente*dt);  
 }
 void Cuerpo::Mueva_V(double dt, double Coeficiente){
-  V+=F*(Coeficiente*dt/m);  omega+=tau*(Coeficiente*dt/I);
+  V+=F*(Coeficiente*dt/m); 
 }
 void Cuerpo::Dibujese(void){
   cout<<" , "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)";
   // cout<<" , "<<r.x()<<"+"<<R*cos(theta)/7<<"*t,"<<r.y()<<"+"<<R*sin(theta)/7<<"*t";
 }
 
+
 //--- clase Colisionador ----
 class Colisionador{
 private:
 public:
-  void CalculeFuerzas(Cuerpo * Grano);
-  void CalculeFuerzaEntre(Cuerpo & Grano1, Cuerpo & Grano2);
-  void CalculeFuerzaPared(Cuerpo & Grano1);
-  //void CalculeFuerzaChoque(Cuerpo & Grano1, Cuerpo & Grano2);
+  void CalculeFuerzas(Cuerpo * Particula);
+  void CalculeFuerzaEntre(Cuerpo & Particula1, Cuerpo & Particula2);
+  void CalculeFuerzaPared(Cuerpo & Particula1);
 };
 
-void Colisionador::CalculeFuerzas(Cuerpo * Grano){
+void Colisionador::CalculeFuerzas(Cuerpo * Particula){
   int i,j;
   
   //--- Borrar todas las fuerzas ---
   for(i=0;i<N;i++)
-    Grano[i].BorreFuerza();
+    Particula[i].BorreFuerza();
   
   //--- Sumar la fuerza de la pared ---
   for(i=0;i<N;i++){
-    CalculeFuerzaPared(Grano[i]);
+    CalculeFuerzaPared(Particula[i]);
+    
   }
   //--- Calcular Fuerzas entre pares de granos ---
   for(i=0;i<N;i++)
     for(j=i+1;j<N;j++){
-      CalculeFuerzaEntre(Grano[i], Grano[j]);
-      //CalculeFuerzaChoque(Grano[i], Grano [j]);
+      CalculeFuerzaEntre(Particula[i], Particula[j]);
     }
 }
 
 
 //Implementación de la fuerzas repulsivas generadas por cada pared
 
-void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
-  double x=Grano1.Getx(), y=Grano1.Gety();
-  vector3D r=Grano1.r;
-  double h, d=r.norm(), R=Grano1.R;
+void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
+  double x=Particula1.Getx(), y=Particula1.Gety();
+  vector3D r=Particula1.r;
+  double h, d=r.norm(), R=Particula1.R;
   vector3D n;
+  int count;
+
+ 
   
   //Pared de la izquierda
   
@@ -104,7 +105,9 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
     h=R-x;
     n.load(1,0,0);
     vector3D F=n*(K*pow(h,1.5));  
-    Grano1.AdicioneFuerza(F);
+    Particula1.AdicioneFuerza(F);
+    count++;
+
   }
   
   //Pared de la derecha
@@ -113,7 +116,8 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
     h=R-(Lx-x);
     n.load(1,0,0);
     vector3D F=n*(K*pow(h,1.5));  
-    Grano1.AdicioneFuerza(F*(-1));
+    Particula1.AdicioneFuerza(F*(-1));
+    count++;
   }
   
   //Pared de abajo
@@ -122,7 +126,8 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
 	 h=R-y;
 	 n.load(0,1,0);
 	 vector3D F=n*(K*pow(h,1.5));  
-    Grano1.AdicioneFuerza(F);
+    Particula1.AdicioneFuerza(F);
+    count++;
   }
   
   
@@ -132,7 +137,8 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
     h=R-(Ly-y);
     n.load(0,1,0);
     vector3D F=n*(K*pow(h,1.5));  
-    Grano1.AdicioneFuerza(F*(-1));
+    Particula1.AdicioneFuerza(F*(-1));
+    count++;
   }
   
 }
@@ -141,28 +147,16 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
 
 //Fuerza de Lennard Jones entre dos moleculas
 
-void Colisionador::CalculeFuerzaEntre(Cuerpo & Grano1,Cuerpo & Grano2){
-  vector3D r21=Grano2.r-Grano1.r;
+void Colisionador::CalculeFuerzaEntre(Cuerpo & Particula1,Cuerpo & Particula2){
+  vector3D r21=Particula2.r-Particula1.r;
   double d=r21.norm();
     vector3D n=r21*(1.0/d);
     vector3D F2=n*12*E/d*(pow(r0/d,12)-pow(r0/d,6));
-    Grano2.AdicioneFuerza(F2);   Grano1.AdicioneFuerza(F2*(-1));
+    Particula2.AdicioneFuerza(F2);   Particula1.AdicioneFuerza(F2*(-1));
+  
  
 }
 
-/*
-
-//Fuerza normal elástica
-void Colisionador::CalculeFuerzaChoque(Cuerpo & Grano1, Cuerpo & Grano2){
-  vector3D r21=Grano2.r-Grano1.r;
-  double d=r21.norm(),s=Grano1.R+Grano2.R-d;
-  if(s>0){
-    vector3D n=r21*(1.0/d);
-    vector3D F2=n*(K*pow(s,1.5));
-    Grano2.AdicioneFuerza(F2);   Grano1.AdicioneFuerza(F2*(-1));
-  }   
-}
-*/
 
 
 //----------------- Funciones de Animacion ----------
@@ -193,51 +187,58 @@ void TermineCuadro(void){
 
 //-----------  Programa Principal --------------  
 int main(void){
-  Cuerpo Grano[N];
+  Cuerpo Particula[N];
   Colisionador Hertz;
   Crandom ran64(1);
-  double m0=1.0, R0=2.5, kT=10, V0=sqrt(2*kT/m0);
+  double m0=1.0, R0=2.5, kT=10.0, V0=sqrt(2*kT/m0);
   int i,ix,iy;
-  double t,tdibujo,tmax=200,/*tmax=10*(Lx/V0),*/ tcuadro=tmax/1000,dt=0.001;
-  //double dx=Lx/(Nx+1), dy=Ly/(Ny+1);
+  double t,tdibujo,tmax=50, tcuadro=tmax/1000,dt=0.001;
   double Theta;
-  double y, yprom, Vx;
+  int count=0;
   
- 
+  
+  InicieAnimacion(); 
  
   //Inicializar las moléculas
   
   for(ix=0;ix<Nx;ix++)
     for(iy=0;iy<Ny;iy++){
       Theta=2*M_PI*ran64.r();//el ángulo de cada molécula respecto a x es aleatorio 
-      //--------------------(       x0,        y0,           Vx0,           Vy0, m0, R0,theta0,omega0)
-      Grano[Nx*iy+ix].Inicie((ix+1)*10, (iy+1)*10, V0*cos(Theta), V0*sin(Theta), m0, R0,     0, 1);
+      //--------------------(       x0,        y0,           Vx0,           Vy0, m0, R0)
+      Particula[Nx*iy+ix].Inicie((ix+1)*10, (iy+1)*10, V0*cos(Theta), V0*sin(Theta), m0, R0);
     }
   
-  for(t=30.000 ; t<30.001 ; t+=dt){
-      for(i=0;i<N;i++) {
-	Vx=Particula[i].GetV();
-	cout<<t<<"\t"<<Vx<<"\n";
-	}
+  for(t=0,tdibujo=0 ; t<tmax ; t+=dt,tdibujo+=dt){
+    //Dibujar
+
+    if(tdibujo>tcuadro){ 
+      InicieCuadro();
+      for(i=0;i<N;i++) Particula[i].Dibujese();
+      TermineCuadro(); 
+      tdibujo=0;
+    }
 
     //--- Muevase por PEFRL ---
-    for(i=0;i<N;i++)Grano[i].Mueva_r(dt,epsilon);
-    Hertz.CalculeFuerzas(Grano);
-    for(i=0;i<N;i++)Grano[i].Mueva_V(dt,lambda2);
-    for(i=0;i<N;i++)Grano[i].Mueva_r(dt,chi);
-    Hertz.CalculeFuerzas(Grano);
-    for(i=0;i<N;i++)Grano[i].Mueva_V(dt,lambda);
-    for(i=0;i<N;i++)Grano[i].Mueva_r(dt,chiepsilon);
-    Hertz.CalculeFuerzas(Grano);
-    for(i=0;i<N;i++)Grano[i].Mueva_V(dt,lambda);
-    for(i=0;i<N;i++)Grano[i].Mueva_r(dt,chi);
-    Hertz.CalculeFuerzas(Grano);
-    for(i=0;i<N;i++)Grano[i].Mueva_V(dt,lambda2);
-    for(i=0;i<N;i++)Grano[i].Mueva_r(dt,epsilon);  
+    for(i=0;i<N;i++)Particula[i].Mueva_r(dt,epsilon);
+    Hertz.CalculeFuerzas(Particula);
+    for(i=0;i<N;i++)Particula[i].Mueva_V(dt,lambda2);
+    for(i=0;i<N;i++)Particula[i].Mueva_r(dt,chi);
+    Hertz.CalculeFuerzas(Particula);
+    for(i=0;i<N;i++)Particula[i].Mueva_V(dt,lambda);
+    for(i=0;i<N;i++)Particula[i].Mueva_r(dt,chiepsilon);
+    Hertz.CalculeFuerzas(Particula);
+    for(i=0;i<N;i++)Particula[i].Mueva_V(dt,lambda);
+    for(i=0;i<N;i++)Particula[i].Mueva_r(dt,chi);
+    Hertz.CalculeFuerzas(Particula);
+    for(i=0;i<N;i++)Particula[i].Mueva_V(dt,lambda2);
+    for(i=0;i<N;i++)Particula[i].Mueva_r(dt,epsilon);  
 
   }   
 
- 
+  ofstream outfile;
+  outfile.open("count.dat");
+  outfile<<count<<endl;
+  outfile.close();
   
   return 0;
 }

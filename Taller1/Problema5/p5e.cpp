@@ -181,9 +181,7 @@ int main(void){
   int i,ix,iy;
   double t,tdibujo,tmax=200, tcuadro=tmax/1000,dt=0.001;
   double Theta, y, yprom;
-  
-  
-  InicieAnimacion(); 
+   
  
   //Inicializar las moléculas
   
