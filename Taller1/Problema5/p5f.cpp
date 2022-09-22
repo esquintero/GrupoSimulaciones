@@ -12,7 +12,7 @@ const double Lx=60, Ly=120;
 const int Nx=5, Ny=5, N=Nx*Ny;
 
 //Constantes de la Fuerza de Lennard Jones
-const double E=1.0, r0=1.0;
+const double E=1.0, r0=10;
 
 const double epsilon=0.1786178958448091e00;
 const double lambda=-0.2123418310626054e00;
@@ -143,12 +143,10 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Grano1){
 
 void Colisionador::CalculeFuerzaEntre(Cuerpo & Grano1,Cuerpo & Grano2){
   vector3D r21=Grano2.r-Grano1.r;
-  double d=r21.norm(),s=Grano1.R+Grano2.R-d;
-  if(s>0){
+  double d=r21.norm();
     vector3D n=r21*(1.0/d);
     vector3D F2=n*12*E/d*(pow(r0/d,12)-pow(r0/d,6));
     Grano2.AdicioneFuerza(F2);   Grano1.AdicioneFuerza(F2*(-1));
-  }
  
 }
 
@@ -216,7 +214,7 @@ int main(void){
       Grano[Nx*iy+ix].Inicie((ix+1)*10, (iy+1)*10, V0*cos(Theta), V0*sin(Theta), m0, R0,     0, 1);
     }
   
-  for(t=62.000 ; t<62.001 ; t+=dt){
+  for(t=30.000 ; t<30.001 ; t+=dt){
       for(i=0;i<N;i++) {
 	Vx=Grano[i].GetV();
 	cout<<t<<"\t"<<Vx<<"\n";
