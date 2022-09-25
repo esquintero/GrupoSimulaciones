@@ -47,7 +47,7 @@ void Cuerpo::Muevase(double dt){
 int main(){
   Cuerpo Particula;
   double r0=10,m0=1,V0;
-  double t,dt=0.001;
+  double t,dt=0.0001;
   V0=sqrt(2*KT/m0);
   
   //------------(x0, y0, Vx0, Vy0, m0, R0)

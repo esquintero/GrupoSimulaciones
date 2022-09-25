@@ -21,6 +21,7 @@ const double lambda=-0.2123418310626054e00;
 const double chi=-0.6626458266981849e-1;
 const double lambda2=(1.0-2.0*lambda)/2.0;
 const double chiepsilon=1.0-2.0*(chi+epsilon);
+int count=0;
 
 //--- declarar clases -----
 class Cuerpo;
@@ -71,6 +72,7 @@ public:
 void Colisionador::CalculeFuerzas(Cuerpo * Particula){
   int i,j;
   
+  
   //--- Borrar todas las fuerzas ---
   for(i=0;i<N;i++)
     Particula[i].BorreFuerza();
@@ -95,9 +97,7 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
   vector3D r=Particula1.r;
   double h, d=r.norm(), R=Particula1.R;
   vector3D n;
-  int count;
-
- 
+  
   
   //Pared de la izquierda
   
@@ -107,6 +107,7 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
     vector3D F=n*(K*pow(h,1.5));  
     Particula1.AdicioneFuerza(F);
     count++;
+    cout<<"golpe"<<endl;
 
   }
   
@@ -118,6 +119,7 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
     vector3D F=n*(K*pow(h,1.5));  
     Particula1.AdicioneFuerza(F*(-1));
     count++;
+    cout<<"golpe"<<endl;
   }
   
   //Pared de abajo
@@ -128,6 +130,7 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
 	 vector3D F=n*(K*pow(h,1.5));  
     Particula1.AdicioneFuerza(F);
     count++;
+    cout<<"golpe"<<endl;
   }
   
   
@@ -139,6 +142,7 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
     vector3D F=n*(K*pow(h,1.5));  
     Particula1.AdicioneFuerza(F*(-1));
     count++;
+    cout<<"golpe"<<endl;
   }
   
 }
@@ -192,10 +196,8 @@ int main(void){
   Crandom ran64(1);
   double m0=1.0, R0=2.5, kT=10.0, V0=sqrt(2*kT/m0);
   int i,ix,iy;
-  double t,tdibujo,tmax=50, tcuadro=tmax/1000,dt=0.001;
+  double t,tdibujo,tmax=200, tcuadro=tmax/1000,dt=0.001;
   double Theta;
-  int count=0;
-  
   
   InicieAnimacion(); 
  
@@ -231,15 +233,17 @@ int main(void){
     for(i=0;i<N;i++)Particula[i].Mueva_r(dt,chi);
     Hertz.CalculeFuerzas(Particula);
     for(i=0;i<N;i++)Particula[i].Mueva_V(dt,lambda2);
-    for(i=0;i<N;i++)Particula[i].Mueva_r(dt,epsilon);  
+    for(i=0;i<N;i++)Particula[i].Mueva_r(dt,epsilon);
+    
+  }
 
-  }   
+   ofstream outfile;
+    outfile.open("count.dat");
+    outfile<<count<<endl;
+    outfile.close();
 
-  ofstream outfile;
-  outfile.open("count.dat");
-  outfile<<count<<endl;
-  outfile.close();
-  
+   
+
   return 0;
 }
 

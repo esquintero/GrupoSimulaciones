@@ -65,8 +65,8 @@ public:
 };
 
 void Colisionador::CalculeFuerzas(Cuerpo * Particula){
-  int i,j;
-  
+  int i,j; 
+ 
   //--- Borrar todas las fuerzas ---
   for(i=0;i<N;i++)
     Particula[i].BorreFuerza();

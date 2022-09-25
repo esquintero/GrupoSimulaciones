@@ -139,11 +139,9 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
 void Colisionador::CalculeFuerzaEntre(Cuerpo & Particula1,Cuerpo & Particula2){
   vector3D r21=Particula2.r-Particula1.r;
   double d=r21.norm();
-    vector3D n=r21*(1.0/d);
-    vector3D F2=n*12*E/d*(pow(r0/d,12)-pow(r0/d,6));
-    Particula2.AdicioneFuerza(F2);   Particula1.AdicioneFuerza(F2*(-1));
-  
- 
+  vector3D n=r21*(1.0/d);
+  vector3D F2=n*12*E/d*(pow(r0/d,12)-pow(r0/d,6));
+  Particula2.AdicioneFuerza(F2);   Particula1.AdicioneFuerza(F2*(-1));
 }
 
 
@@ -151,8 +149,8 @@ void Colisionador::CalculeFuerzaEntre(Cuerpo & Particula1,Cuerpo & Particula2){
 //----------------- Funciones de Animacion ----------
 
 void InicieAnimacion(void){
-  // cout<<"set terminal gif animate"<<endl; 
-  //  cout<<"set output 'Gas2D.gif'"<<endl;
+  cout<<"set terminal gif animate"<<endl; 
+  cout<<"set output 'Gas2D.gif'"<<endl;
   cout<<"unset key"<<endl;
   cout<<"set xrange[-10:"<<Lx+10<<"]"<<endl;
   cout<<"set yrange[-10:"<<Ly+10<<"]"<<endl;
@@ -205,6 +203,7 @@ int main(void){
       TermineCuadro(); 
       tdibujo=0;
     }
+    
 
     //--- Muevase por PEFRL ---
     for(i=0;i<N;i++)Particula[i].Mueva_r(dt,epsilon);
