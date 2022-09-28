@@ -149,8 +149,8 @@ void Colisionador::CalculeFuerzaEntre(Cuerpo & Particula1,Cuerpo & Particula2){
 //----------------- Funciones de Animacion ----------
 
 void InicieAnimacion(void){
-  // cout<<"set terminal gif animate"<<endl; 
-  //  cout<<"set output 'Gas2D.gif'"<<endl;
+  //cout<<"set terminal gif animate"<<endl; 
+  // cout<<"set output 'Gas2D_liquido.gif'"<<endl;
   cout<<"unset key"<<endl;
   cout<<"set xrange[-10:"<<Lx+10<<"]"<<endl;
   cout<<"set yrange[-10:"<<Ly+10<<"]"<<endl;
@@ -199,6 +199,7 @@ int main(void){
 
     if(tdibujo>tcuadro){ 
       InicieCuadro();
+      
       for(i=0;i<N;i++) Particula[i].Dibujese();
       TermineCuadro(); 
       tdibujo=0;

@@ -178,14 +178,10 @@ int main(void){
   Cuerpo Particula[N];
   Colisionador Hertz;
   Crandom ran64(1);
-  double m0=1.0, R0=2.5, kT=10.0, V0=sqrt(2*kT/m0);
+  double m0=1.0, R0=2.5, kT=20.0, V0=sqrt(2*kT/m0);
   int i,ix,iy;
-  double t,tdibujo,tmax=200, tcuadro=tmax/1000,dt=0.001;
-  double Theta;
- 
-  
-  
-  InicieAnimacion(); 
+  double t,tdibujo,tmax=120, tcuadro=tmax/1000,dt=0.001;
+  double Theta; double suma=0;
  
   //Inicializar las moléculas
   
@@ -196,9 +192,13 @@ int main(void){
 				 Particula[Nx*iy+ix].Inicie((ix+1)*10, (iy+1)*10, V0*cos(Theta), V0*sin(Theta), m0, R0);
     }
   
-  for(t=60; t<120; t+=dt){
+  for(t=0; t<tmax; t+=dt){
+    
+    if (80<=t){
     for(i=0;i<N;i++) {
       cout<<t<<"\t"<<Particula[i].GetV()<<endl;
+    }
+    
     }
 ;
     
