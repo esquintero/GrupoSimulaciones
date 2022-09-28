@@ -65,13 +65,15 @@ double ZerosBi(double a, double b){
 
 int main(){
     double zero1=ZerosBi(0.5,4);
-    double zero2=ZerosBi(4,8);
-    double zero3=ZerosBi(8,12);
-    double zero4=ZerosBi(12,15);
+    double zero2=ZerosBi(4,7);
+    double zero3=ZerosBi(7,10);
+    double zero4=ZerosBi(10,13);
+    double zero5=ZerosBi(13,15);
     cout<<"El primer cero está en "<<zero1<<endl;
     cout<<"El segundo cero está en "<<zero2<<endl;
     cout<<"El tercer cero está en "<<zero3<<endl;
     cout<<"El cuarto cero está en "<<zero4<<endl;
+    cout<<"El quinto cero está en "<<zero5<<endl;
     ofstream outfile;
     outfile.open("T1_P2_c_zero1.dat");
     double r;
@@ -94,5 +96,10 @@ int main(){
         outfile <<r<<"\t"<<R(r,zero4)<<endl;
     }
     outfile.close(); 
+    outfile.open("T1_P2_c_zero5.dat");
+    for(r=0.01;r<=1;r+=0.01){
+        outfile <<r<<"\t"<<R(r,zero5)<<endl;
+    }
+    outfile.close();
 
 }

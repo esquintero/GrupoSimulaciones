@@ -59,13 +59,15 @@ int main(){
     double r=1; 
     double l;
     double zero1=ZerosBi(alpha,r,l,0.01,4);
-    double zero2=ZerosBi(alpha,r,l,4,8);
-    double zero3=ZerosBi(alpha,r,l,8,12);
-    double zero4=ZerosBi(alpha,r,l,12,15);
+    double zero2=ZerosBi(alpha,r,l,4,7);
+    double zero3=ZerosBi(alpha,r,l,7,10);
+    double zero4=ZerosBi(alpha,r,l,10,13);
+    double zero5=ZerosBi(alpha,r,l,13,15);
     cout<<"El primer cero está en "<<zero1<<endl;
     cout<<"El segundo cero está en "<<zero2<<endl;
     cout<<"El tercer cero está en "<<zero3<<endl;
     cout<<"El cuarto cero está en "<<zero4<<endl;
+    cout<<"El quinto cero está en "<<zero5<<endl;
 
     ofstream outfile;
     outfile.open("T1_P2_d_zero1.dat");
@@ -86,6 +88,11 @@ int main(){
     outfile.open("T1_P2_d_zero4.dat");
     for(r=0.01;r<=1;r+=0.01){
         outfile <<r<<"\t"<<Bessel(alpha,r,zero4)<<endl;
+    }
+    outfile.close();
+    outfile.open("T1_P2_d_zero5.dat");
+    for(r=0.01;r<=1;r+=0.01){
+        outfile <<r<<"\t"<<Bessel(alpha,r,zero5)<<endl;
     }
     outfile.close();
 }
