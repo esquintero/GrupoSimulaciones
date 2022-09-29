@@ -7,7 +7,7 @@ using namespace std;
 //---- Constantes ---
 const double K=1.0e4;
 const double Lx=160, Ly=60;
-const int N=20, Ns=80, Ntot=N+Ns+3; //Granos que caen, del fondo y totales
+const int N=200, Ns=80, Ntot=N+Ns+3; //Granos que caen, del fondo y totales
 
 const double g=9.8, Gamma=150, Kcundall=500, mu=0.4;
 
@@ -164,7 +164,7 @@ int main(void){
   double m0=1, R0=2;//, kT=10, V0=sqrt(2*kT/m0);
   int i,Nlive;
   double cuadros=5,t,tdibujo,dt=1e-3,
-        tmax=cuadros*sqrt(Ly/g),tcuadro=tmax/(10*cuadros);
+        tmax=cuadros*sqrt(Ly/g),tcuadro=tmax/(0.5*cuadros);
   double Omega0, OmegaMax=8.0;
   double Rpared=100*Lx, Mpared=100*m0, Rs=Lx/(Ns*2);
 
