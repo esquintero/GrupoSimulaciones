@@ -179,7 +179,7 @@ int main(void){
   Crandom ran64(1);
   double m0=1.0, R0=2.5, kT=10.0, V0=sqrt(2*kT/m0);
   int i,ix,iy;
-  double t,tdibujo,tmax=200, tcuadro=tmax/1000,dt=0.001;
+  double t,tdibujo,tmax=800, tcuadro=tmax/1000,dt=0.001;
   double Theta, y, yprom;
    
  

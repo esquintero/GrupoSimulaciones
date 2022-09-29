@@ -1,12 +1,15 @@
 // SIMULACIÓN DEL MOVIMIENTO DE N PARTÍCULAS BAJO EL INFLUJO DE UNA FUERZA DE LENNARD JONES Y CONSIDERANDO FUERZAS REPULSIVAS GENERADAS POR LAS PAREDES  
 
 #include <iostream>
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include "vector.h"
 #include "Random64.h"
 #include <sstream>
 #include <fstream>
+#include <vector>
 using namespace std;
+ofstream outfile;
 
 //---- declarar constantes ---
 const double K=1.0e4;
@@ -21,7 +24,7 @@ const double lambda=-0.2123418310626054e00;
 const double chi=-0.6626458266981849e-1;
 const double lambda2=(1.0-2.0*lambda)/2.0;
 const double chiepsilon=1.0-2.0*(chi+epsilon);
-int count=0;
+int choque=0;
 
 //--- declarar clases -----
 class Cuerpo;
@@ -33,6 +36,7 @@ class Cuerpo{
 private:
   vector3D r,V,F; double m,R; 
 public:
+  int choquex=0, choquey=0; 
   void Inicie(double x0,double y0,double Vx0,double Vy0,double m0,double R0);
   void BorreFuerza(){F.load(0,0,0);};
   void AdicioneFuerza(vector3D F0){F+=F0;};
@@ -43,6 +47,12 @@ public:
   double Gety(void){return r.y();}; //inline
   double GetVx(void){return V.x();};
   double GetVy(void){return V.y();};
+  void Choquex(void){choquex=1;};
+  void Choquey(void){choquey=1;};
+  void ReiniciarChoque(void){
+    choquex=0;
+    choquey=0;
+  };
   friend class Colisionador;
 };
 void Cuerpo::Inicie(double x0,double y0,double Vx0,double Vy0,double m0,double R0){
@@ -52,10 +62,11 @@ void Cuerpo::Mueva_r(double dt, double Coeficiente){
   r+=V*(Coeficiente*dt);  
 }
 void Cuerpo::Mueva_V(double dt, double Coeficiente){
-  V+=F*(Coeficiente*dt/m); 
+  V+=F*(Coeficiente*dt/m);
+  
 }
 void Cuerpo::Dibujese(void){
-  cout<<" , "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)";
+  outfile <<" , "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)";
   // cout<<" , "<<r.x()<<"+"<<R*cos(theta)/7<<"*t,"<<r.y()<<"+"<<R*sin(theta)/7<<"*t";
 }
 
@@ -71,7 +82,7 @@ public:
 
 void Colisionador::CalculeFuerzas(Cuerpo * Particula){
   int i,j;
-  
+
   
   //--- Borrar todas las fuerzas ---
   for(i=0;i<N;i++)
@@ -97,8 +108,7 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
   vector3D r=Particula1.r;
   double h, d=r.norm(), R=Particula1.R;
   vector3D n;
-  
-  
+    
   //Pared de la izquierda
   
   if(x<R){
@@ -106,9 +116,7 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
     n.load(1,0,0);
     vector3D F=n*(K*pow(h,1.5));  
     Particula1.AdicioneFuerza(F);
-    count++;
-    cout<<"golpe"<<endl;
-
+    Particula1.Choquex();
   }
   
   //Pared de la derecha
@@ -118,21 +126,18 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
     n.load(1,0,0);
     vector3D F=n*(K*pow(h,1.5));  
     Particula1.AdicioneFuerza(F*(-1));
-    count++;
-    cout<<"golpe"<<endl;
+    Particula1.Choquex();
   }
   
   //Pared de abajo
   
   if(y<R){
-	 h=R-y;
-	 n.load(0,1,0);
-	 vector3D F=n*(K*pow(h,1.5));  
+    h=R-y;
+    n.load(0,1,0);
+    vector3D F=n*(K*pow(h,1.5));  
     Particula1.AdicioneFuerza(F);
-    count++;
-    cout<<"golpe"<<endl;
+    Particula1.Choquey();
   }
-  
   
   //Pared de arriba
   
@@ -140,9 +145,8 @@ void Colisionador::CalculeFuerzaPared(Cuerpo &Particula1){
     h=R-(Ly-y);
     n.load(0,1,0);
     vector3D F=n*(K*pow(h,1.5));  
-    Particula1.AdicioneFuerza(F*(-1));
-    count++;
-    cout<<"golpe"<<endl;
+    Particula1.AdicioneFuerza(F*(-1));    
+    Particula1.Choquey();
   }
   
 }
@@ -166,27 +170,27 @@ void Colisionador::CalculeFuerzaEntre(Cuerpo & Particula1,Cuerpo & Particula2){
 //----------------- Funciones de Animacion ----------
 
 void InicieAnimacion(void){
-  // cout<<"set terminal gif animate"<<endl; 
-  //  cout<<"set output 'Gas2D.gif'"<<endl;
-  cout<<"unset key"<<endl;
-  cout<<"set xrange[-10:"<<Lx+10<<"]"<<endl;
-  cout<<"set yrange[-10:"<<Ly+10<<"]"<<endl;
-  cout<<"set size ratio -1"<<endl;
-  cout<<"set parametric"<<endl;
-  cout<<"set trange [0:7]"<<endl;
-  cout<<"set isosamples 12"<<endl;  
+  outfile <<"set terminal gif animate"<<endl;
+  outfile <<"set output 'gas2d.gif'"<<endl;
+  outfile <<"unset key"<<endl;
+  outfile <<"set xrange[-10:"<<Lx+10<<"]"<<endl; 
+  outfile <<"set yrange[-10:"<<Ly+10<<"]"<<endl;
+  outfile <<"set size ratio -1"<<endl;
+  outfile <<"set parametric"<<endl;
+  outfile <<"set trange [0:7]"<<endl;
+  outfile <<"set isosamples 12"<<endl;
 }
 
 void InicieCuadro(void){
-    cout<<"plot 0,0 ";
-    cout<<" , "<<Lx/7<<"*t,0";        //pared de abajo
-    cout<<" , "<<Lx/7<<"*t,"<<Ly;     //pared de arriba
-    cout<<" , 0,"<<Ly/7<<"*t";        //pared de la izquierda
-    cout<<" , "<<Lx<<","<<Ly/7<<"*t"; //pared de la derecha
+    outfile <<"plot 0,0 ";
+    outfile <<" , "<<Lx/7<<"*t,0";        //pared de abajo
+    outfile <<" , "<<Lx/7<<"*t,"<<Ly;     //pared de arriba
+    outfile <<" , 0,"<<Ly/7<<"*t";        //pared de la izquierda
+    outfile <<" , "<<Lx<<","<<Ly/7<<"*t"; //pared de la derecha
 }
 
 void TermineCuadro(void){
-    cout<<endl;
+    outfile <<endl;
 }
 
 //-----------  Programa Principal --------------  
@@ -194,32 +198,41 @@ int main(void){
   Cuerpo Particula[N];
   Colisionador Hertz;
   Crandom ran64(1);
-  double m0=1.0, R0=2.5, kT=10.0, V0=sqrt(2*kT/m0);
+  vector<double> kbtvect{2,3,4,5,6,7,8,10,15,20};
+  double m0=1.0, R0=2.5, kT, V0;
   int i,ix,iy;
-  double t,tdibujo,tmax=200, tcuadro=tmax/1000,dt=0.001;
+  double t,tdibujo,tmax=120, tcuadro=tmax/1000,dt=0.001;
   double Theta;
-  
-  InicieAnimacion(); 
+  double total_change=0;
+  int count[2*N]={0};
+  int count3[N]={0}; //save wall hits for each
+
+  outfile.open("T1_P5_i.dat");
+  //InicieAnimacion(); 
  
   //Inicializar las moléculas
-  
-  for(ix=0;ix<Nx;ix++)
+  for(double u : kbtvect){
+    kT=u;
+    V0=sqrt(2*kT/m0);
+    total_change=0;
+  for(ix=0;ix<Nx;ix++){
     for(iy=0;iy<Ny;iy++){
       Theta=2*M_PI*ran64.r();//el ángulo de cada molécula respecto a x es aleatorio 
       //--------------------(       x0,        y0,           Vx0,           Vy0, m0, R0)
       Particula[Nx*iy+ix].Inicie((ix+1)*10, (iy+1)*10, V0*cos(Theta), V0*sin(Theta), m0, R0);
     }
+  }
   
-  for(t=0,tdibujo=0 ; t<tmax ; t+=dt,tdibujo+=dt){
-    //Dibujar
+  for(t=0 ; t<tmax ; t+=dt){
 
-    if(tdibujo>tcuadro){ 
-      InicieCuadro();
-      for(i=0;i<N;i++) Particula[i].Dibujese();
-      TermineCuadro(); 
-      tdibujo=0;
+    double Vy[N], Vx[N];
+    for(i=0;i<N;i++){
+      Vy[i]=Particula[i].GetVy();
+      Vx[i]=Particula[i].GetVx();
     }
 
+    //cout<<Vx[0]<<endl;
+    for(i=0;i<N;i++)Particula[i].ReiniciarChoque();
     //--- Muevase por PEFRL ---
     for(i=0;i<N;i++)Particula[i].Mueva_r(dt,epsilon);
     Hertz.CalculeFuerzas(Particula);
@@ -234,17 +247,26 @@ int main(void){
     Hertz.CalculeFuerzas(Particula);
     for(i=0;i<N;i++)Particula[i].Mueva_V(dt,lambda2);
     for(i=0;i<N;i++)Particula[i].Mueva_r(dt,epsilon);
+
+    double change=0;
+    for(i=0;i<N;i++){
+      if(Particula[i].choquex==1){
+           
+	if(t>80){change+=fabs(Vx[i]-Particula[i].GetVx());}
+      }
+      if(Particula[i].choquey==1){
+	
+	if(t>80){change+=fabs(Vy[i]-Particula[i].GetVy());}
+      }
+      else{count[N+i]=0;}
+    }
     
+    total_change+=change;
   }
-
-   ofstream outfile;
-    outfile.open("count.dat");
-    outfile<<count<<endl;
-    outfile.close();
-
-   
-
+  
+  double Press=(total_change/(120*60));
+  outfile<<u<<" "<<Press<<endl;
+}
+  outfile.close();
   return 0;
 }
-
-  

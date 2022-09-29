@@ -180,7 +180,7 @@ int main(void){
   Crandom ran64(1);
   double m0=1.0, R0=2.5, kT=20.0, V0=sqrt(2*kT/m0);
   int i,ix,iy;
-  double t,tdibujo,tmax=120, tcuadro=tmax/1000,dt=0.001;
+  double t,tdibujo,tmax=280, tcuadro=tmax/1000,dt=0.001;
   double Theta; double suma=0;
  
   //Inicializar las moléculas
