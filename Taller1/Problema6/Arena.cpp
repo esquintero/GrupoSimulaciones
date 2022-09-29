@@ -135,8 +135,8 @@ void Colisionador::CalculeFuerzaEntre(Cuerpo & Grano1,Cuerpo & Grano2
 
 //----------------- Funciones de Animacion ----------
 void InicieAnimacion(void){
-  //  cout<<"set terminal gif animate"<<endl;
-  //  cout<<"set output 'Gas2D.gif'"<<endl;
+  cout<<"set terminal gif animate"<<endl;
+  cout<<"set output 'Gas2D.gif'"<<endl;
   cout<<"unset key"<<endl;
   cout<<"set xrange[-10:"<<Lx+10<<"]"<<endl;
   cout<<"set yrange[-10:"<<Ly+10<<"]"<<endl;
@@ -171,12 +171,13 @@ int main(void){
   InicieAnimacion(); //Dibujar
 
   //Inicializar las paredes
-  for(i=0;i<Ns;i++)
+  for(i=0;i<Ns;i++){
     Grano[N+i].Inicie(Rs*(i*2+1),  0,  0,  0,     0,     0,Mpared,Rs); //Granos de suelo
-  //------------------(  x0,       y0,Vx0,Vy0,theta0,omega0,m0,R0)
-  Grano[N+Ns].Inicie(Lx/2,Ly+Rpared,  0,  0,     0,     0,Mpared,Rpared); //Pared de arriba
-  Grano[N+Ns+1].Inicie(Lx+Rpared,Ly/2,  0,  0,     0,     0,Mpared,Rpared); //Pared derecha
-  Grano[N+Ns+2].Inicie(  -Rpared,Ly/2,  0,  0,     0,     0,Mpared,Rpared); //Pared izquierda
+    //------------------(  x0,       y0,Vx0,Vy0,theta0,omega0,m0,R0)
+    Grano[N+Ns].Inicie(Lx/2,Ly+Rpared,  0,  0,     0,     0,Mpared,Rpared); //Pared de arriba
+    Grano[N+Ns+1].Inicie(Lx+Rpared,Ly/2,  0,  0,     0,     0,Mpared,Rpared); //Pared derecha
+    Grano[N+Ns+2].Inicie(  -Rpared,Ly/2,  0,  0,     0,     0,Mpared,Rpared); //Pared izquierda
+  }
   //Inicializar los granos
   for(i=0;i<N;i++){
       Omega0=OmegaMax*(2*ran64.r()-1); //Modificamos resultado del generador para dar un # entre -1 y 1
