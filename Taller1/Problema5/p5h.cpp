@@ -264,7 +264,7 @@ int main(void){
     total_change+=change;
   }
   
-  double Press=(total_change/(120*60));
+  double Press=(total_change/(40*60));
   outfile<<u<<" "<<Press<<endl;
 }
   outfile.close();
