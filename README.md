@@ -1,4 +1,4 @@
-# Grupo 2 - Métodos de Simulación en Física
+# Talleres - Métodos de Simulación en Física
 
 En el presente repositorio se encuentran todos los códigos, datos, imágenes e información pertinente para el desarrollo de los talleres en la asignatura de Métodos de Simulación en Física.
 
