@@ -1,8 +1,3 @@
-/*
-  Semana 10:
-  Simulacion de onda con perturbacion sinusoidal en el medio con Lattice-Boltzmann
-*/
-
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -28,7 +23,7 @@ class LatticeBoltzmann{
 private:
   double w[Q];        //pesos por direccion
   int Vx[Q], Vy[Q];   //vectores de velocidad
-  double *f, *fnew;   //funciones de distribucion - * es un apuntador que lo lleva a la direccion de memoria 
+  double *f, *fnew;   //funciones de distribucion - * es un apuntador que lo lleva a la direccion de memoria
 public:
   LatticeBoltzmann(void);
   ~LatticeBoltzmann(void);
@@ -39,7 +34,7 @@ public:
   double feq(double rho0, double Ux0, double Uy0, int i);
   void Start(double rho0, double Ux0, double Uy0);
   void Collision(void);
-  void ImposeFields(int t);
+  void ImposeFields(int t,double Ux0,double Uy0);
   void Advection(void);
   void Print(const char * NameFile);
 };
@@ -67,8 +62,8 @@ double LatticeBoltzmann::rho(int ix, int iy, bool UseNew){
     if(UseNew) sum += fnew[n0]; else sum += f[n0];
   }
   return sum;
-} 
-//Componentes del vector J 
+}
+//Componentes del vector J
 double LatticeBoltzmann::Jx(int ix, int iy, bool UseNew){
   double sum; int i, n0;
   for(sum=0, i=0; i<Q; i++){
@@ -88,8 +83,8 @@ double LatticeBoltzmann::Jy(int ix, int iy, bool UseNew){
 //Funcion equilibrio
 double  LatticeBoltzmann::feq(double rho0, double Ux0, double Uy0, int i){
   double UdotVi = Ux0*Vx[i]+Uy0*Vy[i], U2 = Ux0*Ux0+Uy0*Uy0;
-  return rho0*w[i]*(1+(UdotVi/C2)+(pow(UdotVi,2)/(2*pow(C2,2)))-(U2/(2*C2)));  
-} 
+  return rho0*w[i]*(1+(UdotVi/C2)+(pow(UdotVi,2)/(2*pow(C2,2)))-(U2/(2.0*C2)));
+}
 //Start
 void LatticeBoltzmann::Start(double rho0, double Ux0, double Uy0){
   int ix,iy,i,n0;
@@ -99,7 +94,7 @@ void LatticeBoltzmann::Start(double rho0, double Ux0, double Uy0){
         n0 = n(ix,iy,i);
         f[n0] = feq(rho0,Ux0,Uy0,i);
       }
-}  
+}
 //Colision
 void LatticeBoltzmann::Collision(void){
   int ix,iy,i,n0; double rho0,Ux0,Uy0;
@@ -111,23 +106,25 @@ void LatticeBoltzmann::Collision(void){
         n0 = n(ix,iy,i);
         fnew[n0] = UmUtau*f[n0]+Utau*feq(rho0,Ux0,Uy0,i);
       }
-    }  
+    }
 }
 //Imponer campos
-void LatticeBoltzmann::ImposeFields(int t){
+void LatticeBoltzmann::ImposeFields(int t,double Ux0,double Uy0){
   int i, ix, iy, ix0, iy0, n0;
-  double rho0, rho_gauss, Ux0, Uy0;
-  double A = 1, D = C2*(tau-0.5), Sigma = 1, Sigma2 = Sigma*Sigma;
-  double Coef = A/(1+(2*D*t/Sigma2));
+  double rho_gauss, x0_bar, y0_bar;
+  //Constantes Gaussian Hill
+  double A = 1.0, D = C2*(tau-0.5), Sigma = 5.0, Sigma2 = Sigma*Sigma;
+  double Coef = A/(1.0+(2.0*D*t/Sigma2));
+  //Fuente gaussiana en el medio
+  ix0 = Lx/2; iy0 = Ly/2;
   for(ix=0; ix<Lx; ix++){      //para cada celda
     for(iy=0; iy<Ly; iy++){
-      rho0 = rho(ix, iy, false); Ux0=Jx(ix,iy,false)/rho0; Uy0=Jy(ix,iy,false)/rho0;
-      //Fuente gaussiana en el medio
-      ix0 = Lx/2; iy0 = Ly/2;
-      rho_gauss = Coef*exp(-(pow(ix-ix0-Ux0*t,2)+pow(iy-iy0-Uy0*t,2))/(2*(Sigma2+2*D*t))); 
+      //rho0 = rho(ix, iy, false); Ux0=Jx(ix,iy,false)/rho0; Uy0=Jy(ix,iy,false)/rho0;
+      x0_bar=ix0+Ux0*t; y0_bar=iy0+Uy0*t;
+      rho_gauss = 0.05+Coef*exp(-(pow(ix-x0_bar,2)+pow(iy-y0_bar,2))/(2.0*(Sigma2+2.0*D*t))); //K=0.05 es usada para evitar NaN.
       //Ux0=Jx(ix,iy,false)/rho_gauss; Uy0=Jy(ix,iy,false)/rho_gauss;
       for(i=0; i<Q; i++){
-        n0=n(ix,iy,i); 
+        n0=n(ix,iy,i);
         fnew[n0]=feq(rho_gauss,Ux0,Uy0,i);
       }
     }
@@ -161,14 +158,14 @@ void LatticeBoltzmann::Print(const char * NameFile){
 
 int main(void){
   LatticeBoltzmann Ondas;
-  int t, tmax = 100;
-  double rho0 = 1.0, Ux0 = 0.03, Uy0 = 0.03; 
+  int t, tmax = 5;
+  double rho0 = 1.0, Ux0 = 10.5, Uy0 = 10.5;
 
   Ondas.Start(rho0, Ux0, Uy0);
   //Evolucione
-  for(t=1; t<tmax; t++){
+  for(t=0; t<tmax; t++){
     Ondas.Collision();
-    Ondas.ImposeFields(t);
+    Ondas.ImposeFields(t,Ux0,Uy0);
     Ondas.Advection();
   }
   //Imprima
