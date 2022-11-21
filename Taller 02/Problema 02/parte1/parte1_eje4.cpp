@@ -51,11 +51,13 @@ LatticeBoltzmann::~LatticeBoltzmann(void){
 }
 double LatticeBoltzmann::Ccelda(int ix, int iy){
   double C=0.5;
+  double n=2;     // indice de refracción segundo medio
+  double C_2=C/n; // vel de la luz en el segundo medio
   int ix0=100;
   if(ix<ix0)
     return C;
   else
-    return C-C*(1+tanh(ix-ix0))/4;
+    return C-C_2*(1+tanh(ix-ix0))/2;
 }
 double LatticeBoltzmann::rho(int ix,int iy,bool UseNew){
   double sum; int i,n0;
