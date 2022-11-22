@@ -1,14 +1,16 @@
 #include <iostream>
 #include <fstream>
+#define _USE_MATH_DEFINES
 #include <cmath>
 using namespace std;
 
 //-----Constantes Globales-----//
-const int Lx = 400;                 //tamaño de la simulacion
-const int Ly = 180;
+const int Lx = 180;                 //tamaño de la simulacion
+const int Ly = 400;
 
 const int Q = 5;                    //numero de direcciones
 const double W0 = 1.0/3;            //pesos
+const int G = 2;                    //Numero de picos gaussianos
 
 const double C = 0.5;               //velocidad de la onda - por estabilidad numerica: C < 0.707 cells/click
 const double C2 = C*C;
@@ -23,6 +25,7 @@ class LatticeBoltzmann{
 private:
   double w[Q];        //pesos por direccion
   int Vx[Q], Vy[Q];   //vectores de velocidad
+  double M[2][2*G];     //Multivector, que guarda opsición y velocidad de inicio de los picos 
   double *f, *fnew;   //funciones de distribucion - * es un apuntador que lo lleva a la direccion de memoria
 public:
   LatticeBoltzmann(void);
@@ -46,6 +49,12 @@ LatticeBoltzmann::LatticeBoltzmann(void){
   //Vectores de velocidad
   Vx[0] = 0;  Vx[1] = 1;  Vx[2] = 0;  Vx[3] = -1; Vx[4] = 0;
   Vy[0] = 0;  Vy[1] = 0;  Vy[2] = 1;  Vy[3] = 0;  Vy[4] = -1;
+  //Posiciones inicio de los picos
+  M[0][0]=Lx/4; M[0][1]=Ly/4; //Representa el punto inicial en (45,100) para el primer pico
+  M[0][2]=3*Lx/4; M[0][3]=3*Ly/4;  //punto inicial en (135,300) para el segundo pico
+  //velocidades inicio de los picos
+  M[1][0]=1; M[1][1]=1; //Coef de multiplicación de las velocidades U0x y U0y para el primer pico
+  M[1][2]=-1; M[1][3]=-1;
   //Crea arrays dinamicos
   int ArraySize = Lx*Ly*Q;
   f = new double [ArraySize];  fnew = new double [ArraySize];
@@ -110,18 +119,30 @@ void LatticeBoltzmann::Collision(void){
 }
 //Imponer campos
 void LatticeBoltzmann::ImposeFields(int t,double Ux0,double Uy0){
-  int i, ix, iy, ix0, iy0, n0;
-  double rho_gauss, x0_bar, y0_bar;
+  int i, ix, iy, ix0, iy0,ix01, iy01, n0;
+  double rho_gauss, x0_bar, y0_bar,x01_bar, y01_bar;
+  double xbar[G], ybar[G];  //vectores posición bar
   //Constantes Gaussian Hill
   double A = 1.0, D = C2*(tau-0.5), Sigma = 5.0, Sigma2 = Sigma*Sigma;
   double Coef = A/(1.0+(2.0*D*t/Sigma2));
   //Fuente gaussiana en el medio
-  ix0 = Lx/2; iy0 = Ly/2;
+  /*ix0 = Lx/4; iy0 = Ly/4; //punto inicial en (45,100) 
+  ix01 = 3*Lx/4; iy01 = 3*Ly/4; //punto inicial en (135,300)*/
+  //x0_bar=M[0][0]+Ux0*M[1][0]*t; y0_bar=M[0][1]+M[1][1]*Uy0*t;
+  //x01_bar=M[0][2]+Ux0*M[1][2]*t; y01_bar=M[0][3]+M[1][3]*Uy0*t;
+  //inicialización posiciones bar
+  for(int j=0;j<G;j++){
+  xbar[j]=M[0][2*j]+Ux0*M[1][2*j]*t;
+  ybar[j]=M[0][(2*j)+1]+M[1][(2*j)+1]*Uy0*t;
+  }
   for(ix=0; ix<Lx; ix++){      //para cada celda
     for(iy=0; iy<Ly; iy++){
       //rho0 = rho(ix, iy, false); Ux0=Jx(ix,iy,false)/rho0; Uy0=Jy(ix,iy,false)/rho0;
-      x0_bar=ix0+Ux0*t; y0_bar=iy0+Uy0*t;
-      rho_gauss = 0.05+Coef*exp(-(pow(ix-x0_bar,2)+pow(iy-y0_bar,2))/(2.0*(Sigma2+2.0*D*t))); //K=0.05 es usada para evitar NaN.
+      //rho_gauss = 0.05+Coef*exp(-(pow(ix-xbar[0],2)+pow(iy-ybar[0],2))/(2.0*(Sigma2+2.0*D*t)))+Coef*exp(-(pow(ix-xbar[1],2)+pow(iy-ybar[1],2))/(2.0*(Sigma2+2.0*D*t))); //K=0.05 es usada para evitar NaN.
+      rho_gauss=0;
+      for(int k=0;k<G;k++){
+      rho_gauss+=Coef*exp(-(pow(ix-xbar[k],2)+pow(iy-ybar[k],2))/(2.0*(Sigma2+2.0*D*t)));
+      }
       //Ux0=Jx(ix,iy,false)/rho_gauss; Uy0=Jy(ix,iy,false)/rho_gauss;
       for(i=0; i<Q; i++){
         n0=n(ix,iy,i);
@@ -158,7 +179,7 @@ void LatticeBoltzmann::Print(const char * NameFile){
 
 int main(void){
   LatticeBoltzmann Ondas;
-  int t, tmax = 5;
+  int t, tmax = 4;
   double rho0 = 1.0, Ux0 = 10.5, Uy0 = 10.5;
 
   Ondas.Start(rho0, Ux0, Uy0);
