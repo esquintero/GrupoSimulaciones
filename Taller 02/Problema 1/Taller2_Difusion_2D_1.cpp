@@ -9,7 +9,12 @@ using namespace std;
 //ofstream outfile;
 
 const int Lx=256, Ly=256; 
-const double p=0.25, p_0=0.25;//p_0 es la probabilidad de quedarse quieto y p la probabilidad de girar 90 grados
+/*Lista de valores
+1---- p_0=0.25, p=0.25
+2---- p_0=0.1, p=0.2
+3---- p_0=0.2, p=0.05
+4---- p_0=0.15, p=0.1*/
+const double p=0.1, p_0=0.15;//p_0 es la probabilidad de quedarse quieto y p la probabilidad de girar 90 grados
 
 const int Q=4;//Número de flechas
 
@@ -150,8 +155,8 @@ void LatticeGas::Adveccione(void){
 
 
 
-/*double LatticeGas::Varianza(void){
-  int ix, iy; double N, R, Rprom, Sigma2;
+double LatticeGas::Varianza(void){
+  int ix, iy; double N, R,Nx,Ny, Rprom, xprom,yprom,Sigma2x,Sigma2y,Sigma2,SigmaR;
   
   //Calcular N
   for (N=0,ix=0; ix<Lx; ix++){
@@ -161,49 +166,9 @@ void LatticeGas::Adveccione(void){
     }
   }
 
-  //Calcular Rprom
-  for(Rprom=0, ix=0; ix<Lx; ix++){
-    for(iy=0; iy<Ly; iy++){
-      //R=0;
-      R=sqrt(ix*ix+iy*iy);
-      Rprom+=R*rho(ix,iy);
-    }
-  }
-  Rprom=Rprom/N;
-  
-  //Calcular Sigma2
-  for(Sigma2=0, ix=0; ix<Lx; ix++){
-    for(iy=0; iy<Ly; iy++){
-      R=0;
-      R=sqrt(ix*ix+iy*iy);
-      Sigma2+=pow((R-Rprom),2.0)*rho(ix,iy);
-    }
-  }
-  return Sigma2/(N-1);
-  
-
-   //return Sigma2;
-  
-}
-*/
-double LatticeGas::Varianza(void){
-  int ix, iy; double N, R,Nx,Ny, Rprom, xprom,yprom,Sigma2x,Sigma2y,Sigma2,SigmaR;
-  
-  //Calcular N
-  for (N=0,ix=0; ix<Lx; ix++){
-    for(iy=0; iy<Ly; iy++){
-      N+=(n[ix][iy][0]+n[ix][iy][1]+n[ix][iy][2]+n[ix][iy][3]);
-      //N+=rho(ix,iy);
-    }
-  }
-
   //Calcular yprom
   for(yprom=0,Ny=0, ix=0; ix<Lx; ix++){
     for(iy=0; iy<Ly; iy++){
-      //R=0;
-      //R=sqrt(ix*ix+iy*iy);
-      //xprom+=ix*(n[ix][iy][0]+n[ix][iy][2]);
-      //Ny+=(n[ix][iy][1]+n[ix][iy][3]);
       yprom+=iy*rho(ix,iy);
     }
   }
@@ -211,36 +176,25 @@ double LatticeGas::Varianza(void){
   //calc xprom
   for(xprom=0,Nx=0, iy=0; iy<Ly; iy++){
     for(ix=0; ix<Lx; ix++){
-      //R=0;
-      //R=sqrt(ix*ix+iy*iy);
-      //xprom+=ix*(n[ix][iy][0]+n[ix][iy][2]);
-      //Nx+=(n[ix][iy][0]+n[ix][iy][2]);
       xprom+=ix*rho(ix,iy);
     }
   }
   xprom/=N;
-  //Rprom=Rprom/N;
   
   //Calcular Sigma2
   for(Sigma2y=0, ix=0; ix<Lx; ix++){
     for(iy=0; iy<Ly; iy++){
-      //R=0;
-      //R=sqrt(ix*ix+iy*iy);
       Sigma2y+=(pow((iy-yprom),2.0)*rho(ix,iy));
     }
   }
   Sigma2y/=(N-1);
-  //Sigma2y=sqrt(Sigma2y);
 
   for(Sigma2x=0, iy=0; iy<Ly; iy++){
     for(ix=0; ix<Lx; ix++){
-      //R=0;
-      //R=sqrt(ix*ix+iy*iy);
       Sigma2x+=(pow((ix-xprom),2.0)*rho(ix,iy));
     }
   }
   Sigma2x/=(N-1);
-  //Sigma2x=sqrt(Sigma2x);
 
 for( SigmaR=0, ix=0; ix<Lx; ix++){
     for(iy=0; iy<Ly; iy++){
@@ -248,12 +202,7 @@ for( SigmaR=0, ix=0; ix<Lx; ix++){
     }
   }
   SigmaR/=(N-1);
-  //SigmaR=sqrt(SigmaR);
-  
-
-//Sigma2=(Sigma2x+Sigma2y)/(N-1);
-  //Sigma2/=((Nx+Ny)-1);
-  return Sigma2x;
+  return SigmaR;
   
 }
 
@@ -263,7 +212,7 @@ for( SigmaR=0, ix=0; ix<Lx; ix++){
 int main(void){
   
   LatticeGas Difusion;
-  Crandom ran64(0);
+  Crandom ran64(8);
   int N=2400;
   double mu=Lx/2, sigma=16;
   int t, tmax=350;
@@ -271,7 +220,7 @@ int main(void){
   Difusion.Borrese();
   Difusion.Inicie(N, mu, sigma, ran64);
   ofstream outfile;
-  outfile.open("dif2dd2.dat");
+  outfile.open("T2_a_4.dat");
 
  for(t=0; t<tmax;t++){
    outfile<<t<<" "<<Difusion.Varianza()<<endl;
