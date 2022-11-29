@@ -88,7 +88,7 @@ double LatticeBoltzmann::Jy(int ix, int iy, bool UseNew){
 }
 //Trve Forzamiento
 double LatticeBoltzmann::S(int ix, int iy, int t){
-  if((ix>90 && iy>180) && (ix<110 && iy<210)){
+  /*if((ix>90 && iy>180) && (ix<110 && iy<210)){
     return 0.5;
   }
   if((ix>10 && iy>250) && (ix<40 && iy<310)){
@@ -96,8 +96,76 @@ double LatticeBoltzmann::S(int ix, int iy, int t){
   }
   else{
     return 0*t;
+  }*/
+  //Autopistas en el sur
+  if(iy==120 && (ix >0 && ix<132)){
+      return 1;
   }
-}
+  if((ix==45 || ix ==90) && (iy>0 && iy<120)){
+      return 1;
+  }
+  if(iy==60 && (ix >45 && ix<90)){
+      return 1;
+  }
+  //kennedy<<
+  if(ix==60 && (iy >120 && iy<270)){
+      return 1;
+  }
+  if(ix==20 && (iy >120 && iy<200)){
+      return 1;
+  }
+  if(ix==110 && (iy >120 && iy<180)){
+      return 1;
+  }
+  if(ix==150 && (iy >120 && iy<170)){
+      return 1;
+  }
+  if(iy==200 && (ix >20 && ix<60)){
+      return 1;
+  }
+  if(iy==170 && (ix >60 && ix<150)){
+      return 1;
+  }
+  //teusaquillo, engativá y chapinero
+  if(ix==80 && (iy >150 && iy<310)){
+      return 1;
+  }
+  if(ix==130 && (iy >150 && iy<270)){
+      return 1;
+  }
+  if(iy==180 && (ix >80 && ix<130)){
+      return 1;
+  }
+    if(iy==220 && (ix >0 && ix<130)){
+      return 1;
+  }
+    if(iy==250 && (ix >70 && ix<170)){
+      return 1;
+  }
+  if(iy==310 && (ix >70 && ix<180)){
+      return 1;
+  }
+  if(iy==295 && (ix >100 && ix<170)){
+      return 1;
+  }
+    if(ix==80 && (iy >220 && iy<310)){
+      return 1;
+  }
+  if(ix==95 && (iy >220 && iy<310)){
+      return 1;
+  }
+  //autonorte
+  if(ix==145 && (iy >220 && iy<400)){
+      return 1;
+  }
+  if(ix==175 && (iy >220 && iy<400)){
+      return 1;
+  }
+  if(ix==100 && (iy >220 && iy<350)){
+      return 1;
+  }
+
+} 
 //Forzamiento LBGK
 double LatticeBoltzmann::Si(int ix, int iy, double Ux0, double Uy0, int t, int i){
   double UdotVi = Ux0*Vx[i]+Uy0*Vy[i];
@@ -192,7 +260,7 @@ void LatticeBoltzmann::Print(const char * NameFile){
 
 int main(void){
   LatticeBoltzmann Ondas;
-  int t, tmax = 50;
+  int t, tmax = 5;
   double rho0 = 1.0, Ux0 = 0.2, Uy0 = 0.0; 
 
   Ondas.Start(rho0, Ux0, Uy0);
