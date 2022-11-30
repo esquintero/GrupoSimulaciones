@@ -164,7 +164,25 @@ double LatticeBoltzmann::S(int ix, int iy, int t){
   if(ix==100 && (iy >220 && iy<350)){
       return 1;
   }
-
+  //Fabricas
+  if(ix==138 && iy==270){
+    return 1;            // Bavaria cra 53 # 127
+  }
+  if(iy==177 && ix==50){
+    return 1;            // Industria Nacional de Gaseosas cll 25 # 95
+  }
+  if(iy==100 && ix==80){
+    return 1;            // General motors cll 56sur # 36
+  }
+  if(iy==150 && ix==160){
+    return 1;            // Diana cra 13 #93
+  }
+  if(iy==245 && ix==145){
+    return 1;            // Nestle diag 92 # (cra)19
+  }
+  if(){
+    return 1;
+  }
 } 
 //Forzamiento LBGK
 double LatticeBoltzmann::Si(int ix, int iy, double Ux0, double Uy0, int t, int i){
