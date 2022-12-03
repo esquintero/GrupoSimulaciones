@@ -256,7 +256,7 @@ void LatticeBoltzmann::Print(const char * NameFile){
 
 int main(void){
   LatticeBoltzmann Ondas;
-  int t, tmax = 100;
+  int t, tmax = 20;
   double rho0 = 1.0, Ux0 = 0.0, Uy0 = 0.0;
 
   Ondas.Start(rho0, Ux0, Uy0);

@@ -180,7 +180,7 @@ void LatticeBoltzmann::Print(const char * NameFile){
 int main(void){
   LatticeBoltzmann Ondas;
   int t, tmax = 4;
-  double rho0 = 1.0, Ux0 = 10.5, Uy0 = 10.5;
+  double rho0 = 1.0, Ux0 = 0, Uy0 = 0;
 
   //Ondas.Start(rho0, Ux0, Uy0);
   //Evolucione
