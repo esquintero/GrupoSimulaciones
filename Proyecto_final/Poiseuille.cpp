@@ -16,7 +16,7 @@ const double ThreeUmU2tau=3*(1-1/(2*tau));
 //--------------------- Clase LatticeBoltzmann ------------
 class LatticeBoltzmann{
 private:
-  double w[Q];      //Weights 
+  double w[Q];      //Weights
   int Vx[Q],Vy[Q];  //Velocity vectors
   double *f, *fnew; //Distribution Functions
 public:
@@ -57,7 +57,7 @@ double LatticeBoltzmann::rho(int ix,int iy,bool UseNew){
     if(UseNew) sum+=fnew[n0]; else sum+=f[n0];
   }
   return sum;
-}  
+}
 double LatticeBoltzmann::Jx(int ix,int iy,bool UseNew,double Fx){
   double sum; int i,n0;
   for(sum=0,i=0;i<Q;i++){
@@ -65,7 +65,7 @@ double LatticeBoltzmann::Jx(int ix,int iy,bool UseNew,double Fx){
     if(UseNew) sum+=Vx[i]*fnew[n0]; else sum+=Vx[i]*f[n0];
   }
   return sum+0.5*Fx;
-}  
+}
 double LatticeBoltzmann::Jy(int ix,int iy,bool UseNew,double Fy){
   double sum; int i,n0;
   for(sum=0,i=0;i<Q;i++){
@@ -82,7 +82,7 @@ double LatticeBoltzmann::Fi(double Ux0,double Uy0,double Fx,double Fy,int i){
 double  LatticeBoltzmann::feq(double rho0,double Ux0,double Uy0,int i){
   double UdotVi=Ux0*Vx[i]+Uy0*Vy[i], U2=Ux0*Ux0+Uy0*Uy0;
   return rho0*w[i]*(1+3*UdotVi+4.5*UdotVi*UdotVi-1.5*U2);
-}  
+}
 void LatticeBoltzmann::Start(double rho0,double Ux0,double Uy0){
   int ix,iy,i,n0;
   for(ix=0;ix<Lx;ix++) //for each cell
@@ -91,7 +91,7 @@ void LatticeBoltzmann::Start(double rho0,double Ux0,double Uy0){
 	n0=n(ix,iy,i);
 	f[n0]=feq(rho0,Ux0,Uy0,i);
       }
-}  
+}
 void LatticeBoltzmann::Collision(double gx,double gy){
   int ix,iy,i,n0; double rho0,Ux0,Uy0; double Fx,Fy;
   for(ix=0;ix<Lx;ix++) //for each cell
@@ -103,7 +103,7 @@ void LatticeBoltzmann::Collision(double gx,double gy){
 	n0=n(ix,iy,i);
 	fnew[n0]=UmUtau*f[n0]+Utau*feq(rho0,Ux0,Uy0,i)+Fi(Ux0,Uy0,Fx,Fy,i);
       }
-    }  
+    }
 }
 void LatticeBoltzmann::ImposeFields(void){
   int i,ix,iy,n0; double rho0;
@@ -157,5 +157,4 @@ int main(void){
   //Print
   Aire.Print("Poiseuille.dat",g,0);
   return 0;
-}  
-
+}

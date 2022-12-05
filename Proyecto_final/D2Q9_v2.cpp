@@ -12,16 +12,16 @@ using namespace std;
 ofstream outfile;
 
 //-----Constantes Globales-----//
-const int Lx = 101;                 //tamaño de la simulacion
-const int Ly = 101;
+const int Lx = 100;                 //tamaño de la simulacion
+const int Ly = 100;
 
 const int Q = 9;                    //numero de direcciones
 const double W0 = 1.0/3.0;          //cte que define los pesos
 
-const double C = 0.5;               //velocidad de la onda - por estabilidad numerica: C < 0.707 cells/click
+const double C = 0.6;               //velocidad de la onda ajustada a 0.6- por estabilidad numerica: C < 0.707 cells/click
 const double C2 = C*C;
 
-const double tau = 20;             //valores en la funcion de colision - para obtener un D = 0.025
+const double tau = 0.8;             //Valor para que D=0.05
 const double Utau = 1.0/tau;
 const double UmUtau = 1-Utau;
 
@@ -37,6 +37,7 @@ public:
   ~LatticeBoltzmann(void);
   int n(int ix, int iy, int i){return (ix*Ly+iy)*Q+i;};         //indice de las celdas
   double rho(int ix, int iy, bool UseNew);
+  double Ssum(int ix, int iy, bool UseNew);
   double Jx(int ix, int iy, bool UseNew);
   double Jy(int ix, int iy, bool UseNew);
   double S(int ix, int iy, int t);
@@ -45,9 +46,9 @@ public:
   void Start(double rho0, double Ux0, double Uy0);
   void Collision(void);
   //void ImposeFields(int t, double Ux0, double Uy0);
-  void ImposeFields(void);
-  //void Advection(double Ux0, double Uy0, int t);
-  void Advection(void);
+  //void ImposeFields(void);
+  void Advection(double Ux0, double Uy0, int t);    //Advección Camilo
+  //void Advection(void);                               //Advección Profe original
   double Varianza(void);
   void Print(const char * NameFile);
 };
@@ -78,6 +79,14 @@ double LatticeBoltzmann::rho(int ix, int iy, bool UseNew){
   }
   return sum;
 }
+//Ssum
+double LatticeBoltzmann::Ssum(int ix, int iy, bool UseNew){
+  double sum; int i,n0;
+  for(sum=0,i=0;i<Q;i++){
+    if(UseNew) sum+=Snew[ix][iy][i]; else sum+=Sold[ix][iy][i];
+  }
+  return sum;
+}
 //Componentes del vector J
 double LatticeBoltzmann::Jx(int ix, int iy, bool UseNew){
   double sum; int i, n0;
@@ -98,7 +107,7 @@ double LatticeBoltzmann::Jy(int ix, int iy, bool UseNew){
 //Trve Forzamiento
 double LatticeBoltzmann::S(int ix, int iy, int t){
   if(iy==50 && ix==50){
-      return 1;
+      return 2;
   }
   else {
     return 0;
@@ -203,11 +212,11 @@ double LatticeBoltzmann::Si(int ix, int iy, double Ux0, double Uy0, int t, int i
 //Funcion equilibrio
 double  LatticeBoltzmann::feq(double rho0, double Ux0, double Uy0, int i){
   //FEQUILIBRIO TESIS JULIANA
-  //double UdotVi=Ux0*Vx[i]+Uy0*Vy[i], U2=Ux0*Ux0+Uy0*Uy0;
-  //return rho0*w[i]*(1+(UdotVi/C2)+(pow(UdotVi,2)/(2*pow(C2,2)))-(U2/(2*C2)));
-  //FEQUILIBRIO D2Q9 DADA POR PROFE EN CLASE
   double UdotVi=Ux0*Vx[i]+Uy0*Vy[i], U2=Ux0*Ux0+Uy0*Uy0;
-  return rho0*w[i]*(1+3*UdotVi+4.5*UdotVi*UdotVi-1.5*U2);
+  return rho0*w[i]*(1.0+(UdotVi/C2)+(pow(UdotVi,2)/(2*pow(C2,2)))-(U2/(2*C2)));
+  //FEQUILIBRIO D2Q9 DADA POR PROFE EN CLASE
+  //double UdotVi=Ux0*Vx[i]+Uy0*Vy[i], U2=Ux0*Ux0+Uy0*Uy0;
+  //return rho0*w[i]*(1+3*UdotVi+4.5*UdotVi*UdotVi-1.5*U2);
 }
 //Start
 void LatticeBoltzmann::Start(double rho0, double Ux0, double Uy0){
@@ -217,19 +226,20 @@ void LatticeBoltzmann::Start(double rho0, double Ux0, double Uy0){
       for(i=0; i<Q; i++){   //en cada direccion
         n0 = n(ix,iy,i);
         f[n0] = feq(rho0,Ux0,Uy0,i);
-        //Calculamos S con t=0 en matrices old y new. Tendrán los mismos valores al iniciar
+        //Calculamos S con t=0 y t=1
+        //Debido a que S es indep. de t tendrán los mismos valores todo el tiempo
         Sold[ix][iy][i] = Si(ix,iy,Ux0,Uy0,0,i);
-        Snew[ix][iy][i] = Sold[ix][iy][i];
+        Snew[ix][iy][i] = Si(ix,iy,Ux0,Uy0,1,i);
       }
 
-  //PONEMOS UN RHO DISTINTO AL INICIO EN LA CELDA CENTRAL
+  /*//PONEMOS UN RHO DISTINTO AL INICIO EN LA CELDA CENTRAL
   //Calcule los campos macroscopicos en la celda
   double rhoC = 3.0;
   for(i=0;i<Q;i++){     //para cada vector de velocidad
     n0 = n(50,50,i);
     f[n0] = feq(rhoC,Ux0,Uy0,i);
     fnew[n0]=UmUtau*f[n0]+Utau*feq(rho0,Ux0,Uy0,i);
-  }
+  }*/
 }
 //Colision
 void LatticeBoltzmann::Collision(void){
@@ -241,13 +251,13 @@ void LatticeBoltzmann::Collision(void){
       Ux0 = Jx(ix,iy,false)/rho0; Uy0 = Jy(ix,iy,false)/rho0;
       for(i=0;i<Q;i++){     //para cada vector de velocidad
         n0 = n(ix,iy,i);
-        fnew[n0] = UmUtau*f[n0]+Utau*feq(rho0,Ux0,Uy0,i);//+(3.0*Snew[ix][iy][i])/2.0-Sold[ix][iy][i]/2.0;
+        fnew[n0] = UmUtau*f[n0]+Utau*feq(rho0,Ux0,Uy0,i)+(3.0*Snew[ix][iy][i])/2.0-Sold[ix][iy][i]/2.0;
       }
     }
 }
 //Imponer campos
-//void LatticeBoltzmann::ImposeFields(int t, double Ux0, double Uy0){
-/*void LatticeBoltzmann::ImposeFields(){
+/*/void LatticeBoltzmann::ImposeFields(int t, double Ux0, double Uy0){
+void LatticeBoltzmann::ImposeFields(){
   int ix,iy,i,n0; double rho0,Ux0,Uy0;
   ix=50,iy=50;
   //Calcule los campos macroscopicos en la celda
@@ -259,24 +269,25 @@ void LatticeBoltzmann::Collision(void){
   }
 }*/
 //ADVECCION ORIGINAL DE CAMILO
-/*void LatticeBoltzmann::Advection(double Ux0, double Uy0, int t){
+void LatticeBoltzmann::Advection(double Ux0, double Uy0, int t){
   int ix, iy, i, ixnext, iynext, ixback, iyback, n0, n0next;
   for(ix=0;ix<Lx;ix++)      //para cada celda
     for(iy=0;iy<Ly;iy++)
       for(i=0;i<Q;i++){     //en cada direccion
         ixnext = (ix+Vx[i]+Lx)%Lx; iynext = (iy+Vy[i]+Ly)%Ly;
-        //un if que corte las paredes
+        //faltaría un if que corte las paredes (?)
         ixback = (ix-Vx[i]+Lx)%Lx; iyback = (iy-Vy[i]+Ly)%Ly;
         n0 = n(ix,iy,i); n0next = n(ixnext,iynext,i);
         f[n0next] = fnew[n0];     //fronteras periodicas
         //Sold = Snew;
-        Sold[ix][iy][i] = Snew[ixback][iyback][i];
-        Snew[ix][iy][i] = Si(ix,iy,Ux0,Uy0,t,i);
+        //Parece que cambiar los valores de Snew y S no tiene efecto porque siempre se mantienen iguales
+        Sold[ix][iy][i] = Snew[ix][iy][i];
+        Snew[ix][iy][i] = Si(ix,iy,Ux0,Uy0,t+1,i); //Debe ser t+1 porque este Snew será el del siguiente ciclo
         //Sold[ix][iy][i] = Snew[ixback][iyback][i];
-        //Snew[ix][iy][i] = Si(ixnext,iynext,Ux0,Uy0,t,i);
+        //Snew[ix][iy][i] = Si(ix,iy,Ux0,Uy0,t,i);
       }
-}*/
-//ADVECCION ORIGINAL D2Q9 DADA EN CLASE PROFE
+}
+/*/ADVECCION ORIGINAL D2Q9 DADA EN CLASE PROFE
 void LatticeBoltzmann::Advection(void){
   int ix,iy,i,ixnext,iynext,n0,n0next;
   for(ix=0;ix<Lx;ix++) //for each cell
@@ -286,7 +297,7 @@ void LatticeBoltzmann::Advection(void){
 	n0=n(ix,iy,i); n0next=n(ixnext,iynext,i);
 	f[n0next]=fnew[n0]; //periodic boundaries
       }
-}
+}*/
 double LatticeBoltzmann::Varianza(void){
   int ix, iy; double N,R,Rprom,Sigma2x,Sigma2y,SigmaR,xprom,yprom;
 
@@ -352,22 +363,22 @@ void LatticeBoltzmann::Print(const char * NameFile){
 
 int main(void){
   LatticeBoltzmann Ondas;
-  int t, tmax = 200;
+  int t, tmax = 20;
   double rho0 = 1.0, Ux0 = 0.0, Uy0 = 0.0;
-  outfile.open("dftcont.dat");
+  //outfile.open("dftcont.dat");
 
   Ondas.Start(rho0, Ux0, Uy0);
   //Evolucione
   for(t=1; t<tmax; t++){
-    outfile<<t<<" "<<Ondas.Varianza()<<endl;
+    //outfile<<t<<" "<<Ondas.Varianza()<<endl;
     Ondas.Collision();
     //Ondas.ImposeFields();
-    //Ondas.Advection(Ux0, Uy0, t);
-    Ondas.Advection();
+    Ondas.Advection(Ux0, Uy0, t); //Adveccion de Camilo
+    //Ondas.Advection();          //Advección Profe original
   }
-  outfile.close();
+  //outfile.close();
   //Imprima
-  //Ondas.Print("D2Q9.dat");
+  Ondas.Print("D2Q9.dat");
 
   return 0;
 }
