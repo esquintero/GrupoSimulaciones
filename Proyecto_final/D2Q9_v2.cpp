@@ -12,16 +12,16 @@ using namespace std;
 ofstream outfile;
 
 //-----Constantes Globales-----//
-const int Lx = 100;                 //tamaño de la simulacion
-const int Ly = 100;
+const int Lx = 200;                 //tamaño de la simulacion
+const int Ly = 200;
 
 const int Q = 9;                    //numero de direcciones
 const double W0 = 1.0/3.0;          //cte que define los pesos
 
-const double C = 0.6;               //velocidad de la onda ajustada a 0.6- por estabilidad numerica: C < 0.707 cells/click
+const double C = 0.7;               //velocidad de la onda ajustada a 0.6- por estabilidad numerica: C < 0.707 cells/click
 const double C2 = C*C;
 
-const double tau = 0.8;             //Valor para que D=0.05
+const double tau = 0.602;             //Valor para que D=0.04998
 const double Utau = 1.0/tau;
 const double UmUtau = 1-Utau;
 
@@ -106,8 +106,8 @@ double LatticeBoltzmann::Jy(int ix, int iy, bool UseNew){
 }
 //Trve Forzamiento
 double LatticeBoltzmann::S(int ix, int iy, int t){
-  if(iy==50 && ix==50){
-      return 2;
+  if(iy==100 && ix==100){
+      return 8;
   }
   else {
     return 0;
@@ -232,11 +232,37 @@ void LatticeBoltzmann::Start(double rho0, double Ux0, double Uy0){
         Snew[ix][iy][i] = Si(ix,iy,Ux0,Uy0,1,i);
       }
 
-  /*//PONEMOS UN RHO DISTINTO AL INICIO EN LA CELDA CENTRAL
+  ///PONEMOS UN RHO DISTINTO AL INICIO EN LA CELDA CENTRAL
   //Calcule los campos macroscopicos en la celda
-  double rhoC = 3.0;
+  /*double rhoC = 21.0;
   for(i=0;i<Q;i++){     //para cada vector de velocidad
-    n0 = n(50,50,i);
+    n0 = n(100,102,i);
+    f[n0] = feq(rhoC,Ux0,Uy0,i);
+    fnew[n0]=UmUtau*f[n0]+Utau*feq(rho0,Ux0,Uy0,i);
+  }
+  for(ix=99,iy=101;ix<102;ix++){
+  for(i=0;i<Q;i++){     //para cada vector de velocidad
+    n0 = n(ix,iy,i);
+    f[n0] = feq(rhoC,Ux0,Uy0,i);
+    fnew[n0]=UmUtau*f[n0]+Utau*feq(rho0,Ux0,Uy0,i);
+  }
+  }
+  for(ix=98,iy=100;ix<103;ix++){
+  for(i=0;i<Q;i++){     //para cada vector de velocidad
+    n0 = n(ix,iy,i);
+    f[n0] = feq(rhoC,Ux0,Uy0,i);
+    fnew[n0]=UmUtau*f[n0]+Utau*feq(rho0,Ux0,Uy0,i);
+  }
+  }
+  for(ix=99,iy=99;ix<102;ix++){
+  for(i=0;i<Q;i++){     //para cada vector de velocidad
+    n0 = n(ix,iy,i);
+    f[n0] = feq(rhoC,Ux0,Uy0,i);
+    fnew[n0]=UmUtau*f[n0]+Utau*feq(rho0,Ux0,Uy0,i);
+  }
+  }
+  for(i=0;i<Q;i++){     //para cada vector de velocidad
+    n0 = n(100,98,i);
     f[n0] = feq(rhoC,Ux0,Uy0,i);
     fnew[n0]=UmUtau*f[n0]+Utau*feq(rho0,Ux0,Uy0,i);
   }*/
@@ -302,23 +328,23 @@ double LatticeBoltzmann::Varianza(void){
   int ix, iy; double N,R,Rprom,Sigma2x,Sigma2y,SigmaR,xprom,yprom;
 
   //Calcular Ntotal
-  /*for(N=0,ix=0;ix<Lx;ix++){
+  for(N=0,ix=0;ix<Lx;ix++){
     for(iy=0;iy<Ly;iy++){
       N+=rho(ix,iy,true);
     }
-  }*/
-  N=2.0;
+  }
+  N=N-(Lx*Ly);
   //Calcular yprom
   for(yprom=0,ix=0;ix<Lx;ix++){
     for(iy=0;iy<Ly;iy++){
-      yprom+=iy*rho(ix,iy,true);
+      yprom+=iy*(rho(ix,iy,true)-1.0); //Este -1 ya asegura que el prom se mide perfectamente
     }
   }
   yprom/=N;
   //calc xprom
   for(xprom=0,iy=0;iy<Ly;iy++){
     for(ix=0;ix<Lx;ix++){
-      xprom+=ix*rho(ix,iy,true);
+      xprom+=ix*(rho(ix,iy,true)-1.0); //Este -1 ya asegura que el prom se mide perfectamente
     }
   }
   xprom/=N;
@@ -326,25 +352,26 @@ double LatticeBoltzmann::Varianza(void){
   //Calcular Sigma2
   for(Sigma2y=0,ix=0;ix<Lx;ix++){
     for(iy=0;iy<Ly;iy++){
-      Sigma2y+=(pow((iy-yprom),2.0)*rho(ix,iy,true));
+      Sigma2y+=pow((iy-yprom),2)*(rho(ix,iy,true)-1.0);
     }
   }
   Sigma2y/=(N-1);
 
   for(Sigma2x=0,iy=0;iy<Ly;iy++){
     for(ix=0;ix<Lx;ix++){
-      Sigma2x+=(pow((ix-xprom),2.0)*rho(ix,iy,true));
+      Sigma2x+=pow((ix-xprom),2)*(rho(ix,iy,true)-1.0);
     }
   }
   Sigma2x/=(N-1);
 
 for( SigmaR=0, ix=0; ix<Lx; ix++){
     for(iy=0; iy<Ly; iy++){
-      SigmaR+=((pow((iy-yprom),2.0)+(pow((ix-xprom),2.0)))*rho(ix,iy,false));
+      SigmaR+=(pow((iy-yprom),2)+(pow((ix-xprom),2.0)))*(rho(ix,iy,false)-1.0);
     }
   }
   SigmaR/=(N-1);
-  return SigmaR;
+
+  return Sigma2x;
 }
 //Print
 void LatticeBoltzmann::Print(const char * NameFile){
@@ -363,20 +390,20 @@ void LatticeBoltzmann::Print(const char * NameFile){
 
 int main(void){
   LatticeBoltzmann Ondas;
-  int t, tmax = 20;
+  int t, tmax = 75;
   double rho0 = 1.0, Ux0 = 0.0, Uy0 = 0.0;
-  //outfile.open("dftcont.dat");
+  outfile.open("varianza.dat");
 
   Ondas.Start(rho0, Ux0, Uy0);
   //Evolucione
   for(t=1; t<tmax; t++){
-    //outfile<<t<<" "<<Ondas.Varianza()<<endl;
+    if(t>=50){outfile<<t<<" "<<Ondas.Varianza()<<endl;} //Escribimos desde t=50 para la varianza
     Ondas.Collision();
     //Ondas.ImposeFields();
     Ondas.Advection(Ux0, Uy0, t); //Adveccion de Camilo
     //Ondas.Advection();          //Advección Profe original
   }
-  //outfile.close();
+  outfile.close();
   //Imprima
   Ondas.Print("D2Q9.dat");
 
